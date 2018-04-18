@@ -12,7 +12,7 @@ Blockchain::Blockchain(std::string filePath, int difficulty, int MAX_TRANS) {
 }
 
 void Blockchain::createGenesis() {
-	this->blocks =new Block("gilda", 0);
+	this->blocks =new Block(Util::Hash256("gildacoin"), 0);
 }
 
 Block *Blockchain::getGenesis() {

@@ -5,7 +5,6 @@
 #include <sstream>
 #include <openssl\ssl.h>
 #include <openssl\sha.h>
-#include <openssl\rsa.h>
 #include <openssl\err.h>
 #include <openssl\conf.h>
 #include <openssl\engine.h>

@@ -25,11 +25,25 @@ namespace Util {
 		CRYPTO_cleanup_all_ex_data();
 	}
 
+
 	// return the number of bytes that are zero. used for mining Blocks
 	int numZeroHash(const std::string hash) {
 		int len = 0;
-		while (hash.at(len)=='0') {
-			len++;
+		for (int i = 0; i < (int)hash.size(); i++) {
+			char c = hash.at(i);
+			if (c == '0') { len += 8; }else{
+				switch (c) {
+				case '1': len += 7; break;
+				case '2': len += 6; break;
+				case '3': len += 5; break;
+				case '4': len += 4; break;
+				case '5': len += 3; break;
+				case '6': len += 2; break;
+				case '7': len += 1; break;
+				case '8': len += 0; break;
+				}
+				break;
+			}
 		}
 		return len;
 	}
@@ -47,7 +61,6 @@ namespace Util {
 		// output to the char [] hash
 		SHA256_Final(hash, &sha256);
 		// re-encode the char[] to hex string
-		std::string rets(hash, hash + SHA256_DIGEST_LENGTH);
 		for (int i = 0; i < 32; i++) {
 			ss << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)hash[i];
 		}

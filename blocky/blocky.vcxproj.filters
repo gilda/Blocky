@@ -30,6 +30,9 @@
     <ClCompile Include="Blockchain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Crypto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Blockchain.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypto.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
