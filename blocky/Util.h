@@ -17,4 +17,5 @@ namespace Util {
 	void cleanupOpenSSL();
 	int numZeroHash(std::string hash);
 	std::string Hash256(std::string mess);
+	std::string padString(std::string str, int length);
 }

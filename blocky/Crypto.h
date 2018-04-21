@@ -7,5 +7,8 @@
 
 namespace Crypto {
 	EC_KEY *genKey();
-	void setPubKey(EC_KEY *eckey, std::string key);
+	int setPubKey(EC_KEY *eckey, std::string key, int ybit);
+	int setPrivKey(EC_KEY *eckey, std::string key);
+	std::string sign(std::string message, std::string strPrivKey);
+	int verify(std::string hash, std::string signature, std::string publicKey);
 }

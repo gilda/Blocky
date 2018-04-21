@@ -66,4 +66,20 @@ namespace Util {
 		}
 		return ss.str();
 	}
+
+	std::string padString(std::string str, int len) {
+		int length = (int)str.length();
+		if (length>len) {
+			return nullptr;
+		}
+		else if (length == len) {
+			return str;
+		}
+		else {
+			for (int i = 0; i < len - length; i++) {
+				str += "0";
+			}
+			return str;
+		}
+	}
 }
