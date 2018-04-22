@@ -4,96 +4,91 @@ namespace Crypto {
 	
 	// generate private public key pair
 	EC_KEY *genKey() {
-		EC_KEY *ec_key = EC_KEY_new();
+		EC_KEY *ec_key = EC_KEY_new(); // allocate memory
 		EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(NID_secp256k1);
-		EC_KEY_set_group(ec_key, ec_group);
-		EC_KEY_generate_key(ec_key);
+		EC_KEY_set_group(ec_key, ec_group); // set curve group
+		EC_KEY_generate_key(ec_key); // find keys
 		return ec_key;
 	}
 
-	// set the public part of the key
-	int setPubKey(EC_KEY *eckey, std::string key, int ybit) {
-		if (key.length() != 64) { 
-			return -1;
-		}else{
-			BIGNUM *x = BN_new();
-			BN_hex2bn(&x, key.c_str());
-			EC_POINT *pub = EC_POINT_new(EC_KEY_get0_group(eckey));
-			EC_POINT_set_compressed_coordinates_GFp(
-				EC_GROUP_new_by_curve_name(NID_secp256k1),
-				pub, x, ybit, NULL);
-			return 0;
-		}
+	// returns the string of public key given
+	std::string getPublicString(EC_KEY *key) {
+		const EC_POINT *point = EC_KEY_get0_public_key(key); // get point of public key
+		BIGNUM *x = BN_new();
+		BIGNUM *y = BN_new();
+		EC_POINT_get_affine_coordinates_GFp(EC_KEY_get0_group(key), point, x, y, NULL); // extract to BN
+		return BN_bn2hex(x) + std::to_string(BN_is_odd(y)); // return as string the public key in compressed form
 	}
 
-	// set the private part of the key
-	int setPrivKey(EC_KEY *eckey, std::string key) {
-		if (key.length()!=64) {
-			return -1;
-		}else {
-			BIGNUM *bnkey = BN_new();
-			BN_hex2bn(&bnkey, key.c_str());
-			EC_KEY_set_private_key(eckey, bnkey);
-			return 0;
-		}
+	// returns the string of private key given
+	std::string getPrivateString(EC_KEY *key) {
+		const BIGNUM *priv = EC_KEY_get0_private_key(key);
+		return std::string(BN_bn2hex(priv));
 	}
 
 	// return the signature of the message by private key
 	std::string sign(std::string message, std::string strPrivKey) {
-		EC_KEY *privKey = EC_KEY_new();
-		EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(NID_secp256k1);
-		EC_KEY_set_group(privKey, ec_group);
+		if (strPrivKey.length() != 64) {
+			return nullptr;
+		}else {
+			unsigned char hash[SHA256_DIGEST_LENGTH]; // allocate hash char
+			SHA256_CTX sha256;
+			SHA256_Init(&sha256); // init hash object
+			SHA256_Update(&sha256, message.c_str(), message.length()); // hash the message given
+			SHA256_Final(hash, &sha256); // ouput to allocated char
 
-		BIGNUM *bnpriv = BN_new();
-		BN_hex2bn(&bnpriv, strPrivKey.c_str());
-		EC_KEY_set_private_key(privKey, bnpriv);
+			EC_KEY *ec_key = EC_KEY_new();
+			EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(NID_secp256k1);
+			EC_KEY_set_group(ec_key, ec_group); // allocate memory and init key
+			BIGNUM *bnPriv = BN_new();
+			BN_hex2bn(&bnPriv, strPrivKey.c_str()); // parse private key
+			EC_KEY_set_private_key(ec_key, bnPriv); // set private part to parsed BN
 
-		unsigned char hash[SHA256_DIGEST_LENGTH];
-		SHA256_CTX sha256;
-		SHA256_Init(&sha256);
-		SHA256_Update(&sha256, message.c_str(), message.length());
-		SHA256_Final(hash, &sha256);
+			const ECDSA_SIG *sig = ECDSA_do_sign(hash, SHA256_DIGEST_LENGTH, ec_key); // sign the message
+			const BIGNUM *r = BN_new();
+			const BIGNUM *s = BN_new();
+			ECDSA_SIG_get0(sig, &r, &s); // get EC_POINT to BN
 
-		const ECDSA_SIG *signature = ECDSA_do_sign(hash, SHA256_DIGEST_LENGTH, privKey);
-		const BIGNUM *r = BN_new();
-		const BIGNUM *s = BN_new();
-		ECDSA_SIG_get0(signature, &r, &s);
-
-		std::string sig = BN_bn2hex(r);
-		sig += BN_bn2hex(s);
-		return sig;
+			std::string signature(BN_bn2hex(r)); // parse r part of sig
+			signature += BN_bn2hex(s); // parse s part of sig
+			return signature;
+		}
 	}
 
 	// return bool wether or not the signature is verfied
 	int verify(std::string message, std::string signature, std::string publicKey) {
-		if (publicKey.length() != 128 && signature.length() != 128) {
-			return -1;
-		}else {
-			ECDSA_SIG *sig = ECDSA_SIG_new();
+		if (publicKey.length() != 65 && signature.length() != 128) {
+			return -1; // check for string length
+		}
+		else {
+			unsigned char hash[SHA256_DIGEST_LENGTH]; // allocate hash char
+			SHA256_CTX sha256;
+			SHA256_Init(&sha256); // init hash object
+			SHA256_Update(&sha256, message.c_str(), message.length()); // hash the message given
+			SHA256_Final(hash, &sha256); // ouput to allocated char
+
+			ECDSA_SIG *sig = ECDSA_SIG_new(); // allocate signature
 			BIGNUM *r = BN_new();
 			BIGNUM *s = BN_new();
-			BN_hex2bn(&r, signature.substr(1, 64).c_str());
-			BN_hex2bn(&s, signature.substr(64, 64).c_str());
-			ECDSA_SIG_set0(sig, r, s);
+			BN_hex2bn(&r, signature.substr(0, 64).c_str()); // parse r part
+			BN_hex2bn(&s, signature.substr(64, 64).c_str()); // parse s part
+			ECDSA_SIG_set0(sig, r, s); // set r and s to sig
 
-			unsigned char hash[SHA256_DIGEST_LENGTH];
-			SHA256_CTX sha256;
-			SHA256_Init(&sha256);
-			SHA256_Update(&sha256, message.c_str(), message.length());
-			SHA256_Final(hash, &sha256);
+			EC_KEY *ec_key = EC_KEY_new();
+			EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(NID_secp256k1);
+			EC_KEY_set_group(ec_key, ec_group); // init and setup key
 			
-			EC_KEY *pubKey = EC_KEY_new();
-			EC_KEY_set_group(pubKey, EC_GROUP_new_by_curve_name(NID_secp256k1));
-			EC_POINT *pubKeyPoint = EC_POINT_new(EC_KEY_get0_group(pubKey));
-			BIGNUM *bnx = BN_new();
-			BIGNUM *bny = BN_new();
-			BN_hex2bn(&bnx, publicKey.substr(1,64).c_str());
-			BN_hex2bn(&bny, publicKey.substr(64, 64).c_str());
-			EC_POINT_set_affine_coordinates_GFp(EC_KEY_get0_group(pubKey), pubKeyPoint, bnx, bny, NULL);
-			EC_KEY_set_public_key(pubKey, pubKeyPoint);
-
-			return ECDSA_do_verify(hash, SHA256_DIGEST_LENGTH, sig, pubKey);
+			BIGNUM *pubKeyx = BN_new();
+			BN_hex2bn(&pubKeyx, publicKey.substr(0,64).c_str()); // parse x part
+			int ybit; // ybit on y is positive or negative
+			sscanf_s(publicKey.substr(64, 1).c_str(), "%d", &ybit); // parse y bit
+			EC_POINT *pubKeyPoint = EC_POINT_new(EC_KEY_get0_group(ec_key)); // init point
+			// set point x and y to x by group and y bit
+			EC_POINT_set_compressed_coordinates_GFp(EC_KEY_get0_group(ec_key), pubKeyPoint, pubKeyx, ybit, NULL); 
+			
+			EC_KEY_set_public_key(ec_key, pubKeyPoint); // set public key to point parsed
+			
+			return ECDSA_do_verify(hash, SHA256_DIGEST_LENGTH, sig, ec_key); // check the signature
 		}
 	}
-
 }

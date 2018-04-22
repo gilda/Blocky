@@ -38,12 +38,14 @@ std::string Transaction::toString() {
 		this->signature + "&}";
 }
 
+// signs the transaction and updates member signature
 int Transaction::sign(std::string privKey) {
-	std::string sign = Crypto::sign(this->stringify(), privKey);
+	std::string sign = Crypto::sign(this->stringify(), privKey); // sign the stringify of Transaction
 	this->signature = sign;
 	return 1;
 }
 
+// reuturn the signature of this Transaction
 std::string Transaction::getSignature() {
 	return this->signature;
 }
