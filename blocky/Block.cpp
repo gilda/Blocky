@@ -74,3 +74,15 @@ bool Block::mine(int difficulty) {
 	printf("%s", ("elapsed time: "+std::to_string((double)eTime/1000000)+" seconds\r\n").c_str());
 	return this->mined;
 }
+
+// verifies the transaction
+int Block::verifyTransaction(Transaction trans, std::string sig, std::string pubKey) {
+	if (Crypto::verify(trans.stringifyVerify(), sig, pubKey) && trans.getSignature()!="") {
+		this->addTransaction(trans); // add Transaction to array
+		return 1; // success
+	}else if(trans.getSignature()!=""){
+		return 0; // verify failed
+	}else {
+		return -1; // error
+	}
+}

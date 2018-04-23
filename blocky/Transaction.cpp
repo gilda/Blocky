@@ -38,9 +38,19 @@ std::string Transaction::toString() {
 		this->signature + "&}";
 }
 
+// returns the transactions without member signature
+std::string Transaction::stringifyVerify() {
+	return
+		std::to_string(this->id) + "#"
+		+ this->donor + "->"
+		+ std::to_string(this->amount) + "->"
+		+ this->recipient + "&&";
+}
+
+
 // signs the transaction and updates member signature
 int Transaction::sign(std::string privKey) {
-	std::string sign = Crypto::sign(this->stringify(), privKey); // sign the stringify of Transaction
+	std::string sign = Crypto::sign(this->stringifyVerify(), privKey); // sign the stringify of Transaction
 	this->signature = sign;
 	return 1;
 }

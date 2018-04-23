@@ -16,4 +16,5 @@ public:
 	Block *getGenesis();
 	Block *getLastBlock();
 	bool mineLastBlock();
+	int addTransaction(std::string donor, int amount, std::string recepient);
 };

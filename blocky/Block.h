@@ -21,4 +21,5 @@ public:
 	std::string stringify();
 	std::string toString();
 	bool mine(int difficulty);
+	int verifyTransaction(Transaction trans, std::string sig, std::string pubKey);
 };

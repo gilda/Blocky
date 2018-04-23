@@ -29,7 +29,7 @@ namespace Crypto {
 	// return the signature of the message by private key
 	std::string sign(std::string message, std::string strPrivKey) {
 		if (strPrivKey.length() != 64) {
-			return nullptr;
+			return nullptr; // error
 		}else {
 			unsigned char hash[SHA256_DIGEST_LENGTH]; // allocate hash char
 			SHA256_CTX sha256;

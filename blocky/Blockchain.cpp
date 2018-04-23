@@ -26,3 +26,7 @@ Block *Blockchain::getLastBlock() {
 bool Blockchain::mineLastBlock() {
 	return this->getLastBlock()->mine(this->difficulty);
 }
+
+int addTransaction(std::string donor, int amount, std::string recepient) {
+	Transaction transaction = Transaction();
+}

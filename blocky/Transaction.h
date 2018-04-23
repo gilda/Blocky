@@ -15,5 +15,6 @@ public:
 	std::string stringify();
 	std::string toString();
 	int sign(std::string privKey);
+	std::string Transaction::stringifyVerify();
 	std::string getSignature();
 };

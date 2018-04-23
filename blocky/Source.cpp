@@ -6,13 +6,13 @@
 #include "Crypto.h"
 
 int main() {
-	//TODO Transaction: stringifyVerify(), verify() 
-	//TODO Crypto: sign return
-	//TODO Block: validateTransaction()
 	//TODO BlockChain: addTransaction(), addBlock(), validateBlock()
 	//TODO Ledger: openFile(), writeBlockchain(), start parser
+	//TODO Block: getLastTransaction(), getId()
+	//TODO Transaction: getId()
+	//TODO Crypto: 
 	//TODO Util:
-	//TODO UI:
+	//TODO GUI:
 
 	Util::initOpenSSL(); // init OpenSSL
 	Blockchain gldc = Blockchain("gldc.ledg", 32, 10);
