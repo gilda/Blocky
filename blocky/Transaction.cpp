@@ -30,7 +30,7 @@ std::string Transaction::stringify() {
 // toString prints all info for debugging or viewing
 std::string Transaction::toString() {
 	return 
-		"{#"+
+		"{"+
 		std::to_string(this->id) + "#" + 
 		this->donor+" -> "+
 		std::to_string(this->amount)+" -> "+
@@ -58,4 +58,9 @@ int Transaction::sign(std::string privKey) {
 // reuturn the signature of this Transaction
 std::string Transaction::getSignature() {
 	return this->signature;
+}
+
+// returns the transactions id
+int Transaction::getId() {
+	return this->id;
 }

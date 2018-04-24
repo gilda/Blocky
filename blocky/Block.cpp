@@ -12,12 +12,26 @@ Block::Block(std::string prevHash, int id) {
 	this->mined = false;
 }
 
+// default constructor
+Block::Block() {
+	this->id = 0;
+	this->prevHash = "";
+	this->nonce = 0;
+	this->currHash = "";
+	this->numTrans = 0;
+	this->transactions = new Transaction[numTrans];
+	this->mined = false;
+}
+
 // adding a transaction to the Block
-void Block::addTransaction(Transaction transToAdd) {
+void Block::addTransaction(Transaction transToAdd, std::string privKey) {
 	Transaction *temp = new Transaction[this->numTrans+1]; // create larger array
 	for (int i = 0; i < this->numTrans; i++) {
 		//copy the old array of transactions
 		*(temp + i) = *(this->transactions + i);
+	}
+	if(transToAdd.getSignature()==""){
+		transToAdd.sign(privKey);
 	}
 	*(temp + this->numTrans) = transToAdd; // assign new Transaction
 	this->transactions = temp; // change pointer
@@ -27,13 +41,13 @@ void Block::addTransaction(Transaction transToAdd) {
 // returns string for hashing and file writing
 std::string Block::stringify(){
 	std::string rets =
-		std::to_string(this->id) + "|" +
+		std::to_string(this->id) + "#" +
 		this->prevHash + "|" +
-		std::to_string(this->nonce) + "|" +
-		std::to_string(this->numTrans) + "|";
+		std::to_string(this->nonce) + "N" +
+		std::to_string(this->numTrans) + "T:";
 	// loop over all transactions
 	for (int i = 0; i < this->numTrans; i++) {
-		rets += std::to_string(i) + ":" + (this->transactions + i)->stringify() + "|";
+		rets += (this->transactions + i)->stringify() + ":";
 	}
 	return rets;
 }
@@ -52,7 +66,7 @@ std::string Block::toString() {
 		"nonce: " + std::to_string(this->nonce) + "\r\n" +
 		"mined: " + (this->mined ? "true" : "false") + "\r\n" +
 		"currHash: " + this->currHash + "\r\n" +
-		"numTrans: " + std::to_string(this->numTrans) + "\r\n";
+		"numTrans: " + std::to_string(this->numTrans) + "\r\n\r\n";
 	// loop over all transactions
 	for (int i = 0; i < this->numTrans; i++) {
 		rets += std::to_string(i)+": "+(this->transactions + i)->toString() +"\r\n";
@@ -71,14 +85,33 @@ bool Block::mine(int difficulty) {
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	this->mined = true;
 	long long int eTime = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-	printf("%s", ("elapsed time: "+std::to_string((double)eTime/1000000)+" seconds\r\n").c_str());
+	printf("%s", ("elapsed time: "+std::to_string((double)eTime/1000000)+" seconds\r\n\r\n").c_str());
 	return this->mined;
+}
+
+// reutns the last transaction added to the block
+Transaction *Block::getLastTransaction() {
+	return this->transactions + this->numTrans - 1;
+}
+
+// returns the block id
+int Block::getId() {
+	return this->id;
+}
+
+// returns NumTrans
+int Block::getNumTrans(){
+	return this->numTrans;
+}
+
+// retutns the hash of the current block
+std::string Block::getCurrHash() {
+	return this->currHash;
 }
 
 // verifies the transaction
 int Block::verifyTransaction(Transaction trans, std::string sig, std::string pubKey) {
 	if (Crypto::verify(trans.stringifyVerify(), sig, pubKey) && trans.getSignature()!="") {
-		this->addTransaction(trans); // add Transaction to array
 		return 1; // success
 	}else if(trans.getSignature()!=""){
 		return 0; // verify failed

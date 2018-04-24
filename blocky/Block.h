@@ -16,10 +16,15 @@ class Block {
 public:
 	
 	Block(std::string prevHash, int id);
-	void addTransaction(Transaction transToAdd);
+	Block();
+	void addTransaction(Transaction transToAdd, std::string privKey);
 	std::string hashBlock();
 	std::string stringify();
 	std::string toString();
 	bool mine(int difficulty);
+	Transaction *getLastTransaction();
+	int getId();
+	int getNumTrans();
+	std::string getCurrHash();
 	int verifyTransaction(Transaction trans, std::string sig, std::string pubKey);
 };
