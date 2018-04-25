@@ -23,6 +23,7 @@ public:
 	std::string toString();
 	bool mine(int difficulty);
 	Transaction *getLastTransaction();
+	Transaction *getTransaction(int index);
 	int getId();
 	int getNumTrans();
 	std::string getCurrHash();

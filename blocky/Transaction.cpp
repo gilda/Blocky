@@ -64,3 +64,7 @@ std::string Transaction::getSignature() {
 int Transaction::getId() {
 	return this->id;
 }
+
+std::string Transaction::getDonor(){
+	return this->donor;
+}

@@ -15,8 +15,9 @@ public:
 	void createGenesis();
 	Block *getGenesis();
 	Block *getLastBlock();
+	Block *getBlock(int index);
 	bool mineLastBlock();
 	void addTransaction(std::string privKey, std::string donor, int amount, std::string recepient);
 	void addBlock();
-	//bool validateBlock(); loops over all transactions and check's signatures, checks block hash
+	bool validateBlock(int index);
 };

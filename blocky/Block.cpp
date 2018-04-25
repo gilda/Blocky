@@ -94,6 +94,10 @@ Transaction *Block::getLastTransaction() {
 	return this->transactions + this->numTrans - 1;
 }
 
+Transaction *Block::getTransaction(int index){
+	return this->transactions+index;
+}
+
 // returns the block id
 int Block::getId() {
 	return this->id;

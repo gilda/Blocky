@@ -6,7 +6,7 @@
 #include "Crypto.h"
 
 int main() {
-	//TODO Blockchain: bool validateBlock()
+	//TODO Blockchain: bool validateBlock(){validate amount of gldc}
 	//TODO Ledger: openFile(), writeBlockchain(), start parser
 	//TODO CLI:
 	//TODO Transaction: 
@@ -21,13 +21,11 @@ int main() {
 	EC_KEY *key1 = Crypto::genKey();
 	gldc.addTransaction(Crypto::getPrivateString(key), Crypto::getPublicString(key), 10, Crypto::getPublicString(key1));
 	printf("transaction string: %s\r\n\r\n", gldc.getLastBlock()->getLastTransaction()->stringify().c_str());
+	gldc.addTransaction(Crypto::getPrivateString(key1), Crypto::getPublicString(key1), 5, Crypto::getPublicString(key));
+	printf("transaction string: %s\r\n\r\n", gldc.getLastBlock()->getTransaction(1)->stringify().c_str());
 	gldc.mineLastBlock();
-	printf("block: %s\r\n\r\n", gldc.getGenesis()->toString().c_str());
-	printf("verify: %s\r\n", gldc.getLastBlock()->verifyTransaction(
-		*gldc.getLastBlock()->getLastTransaction(),
-		gldc.getLastBlock()->getLastTransaction()->getSignature(),
-		Crypto::getPublicString(key))==1 ? "true" : "false");
-
+	printf("verify block: %s\r\n\r\n", gldc.validateBlock(0) ? "true" : "false");
+	printf("block genesis: %s\r\n\r\n", gldc.getBlock(0)->toString().c_str());
 
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");

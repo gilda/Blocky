@@ -18,4 +18,5 @@ public:
 	std::string stringifyVerify();
 	std::string getSignature();
 	int getId();
+	std::string getDonor();
 };

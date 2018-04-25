@@ -21,6 +21,11 @@ Block *Blockchain::getGenesis() {
 	return this->blocks;
 }
 
+// returns the index'th block of the blockchain
+Block *Blockchain::getBlock(int index){
+	return this->blocks+index;
+}
+
 // gets the last block
 Block *Blockchain::getLastBlock() {
 	return this->blocks + this->numBlocks - 1;
@@ -46,4 +51,20 @@ void Blockchain::addBlock() {
 	*(temp + this->numBlocks) = Block(this->getLastBlock()->getCurrHash(), this->getLastBlock()->getId()+1);
 	this->blocks = temp;
 	this->numBlocks++;
+}
+
+// returns true or false for the block
+bool Blockchain::validateBlock(int index){
+	if(this->getBlock(index)->getCurrHash()!=Util::Hash256(this->getBlock(index)->stringify())){
+		return false;
+	} else {
+		for(int i = 0; i<this->getBlock(index)->getNumTrans(); i++){
+			if(this->getBlock(index)->verifyTransaction(*this->getBlock(index)->getTransaction(i),
+														this->getBlock(index)->getTransaction(i)->getSignature(),
+														this->getBlock(index)->getTransaction(i)->getDonor())!=1){
+				return false;
+			}
+		}
+		return true;
+	}
 }
