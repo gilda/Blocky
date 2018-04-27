@@ -31,6 +31,11 @@ Block *Blockchain::getLastBlock() {
 	return this->blocks + this->numBlocks - 1;
 }
 
+// returns the blockchain path
+std::string Blockchain::getFilePath(){
+	return this->filePath;
+}
+
 // mines last block
 bool Blockchain::mineLastBlock() {
 	return this->getLastBlock()->mine(this->difficulty);

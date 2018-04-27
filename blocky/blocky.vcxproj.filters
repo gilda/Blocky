@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{4a133fdd-e24f-45f3-bbd3-54c0b71cbd3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Block.cpp">
@@ -24,14 +27,17 @@
     <ClCompile Include="Transaction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Blockchain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
     <ClCompile Include="Crypto.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="FileManager.cpp">
+      <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,14 +47,17 @@
     <ClInclude Include="Transaction.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Util.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Blockchain.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Source Files\Helper</Filter>
+    </ClInclude>
     <ClInclude Include="Crypto.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="FileManager.h">
+      <Filter>Source Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -128,6 +128,7 @@
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Blockchain.cpp" />
     <ClCompile Include="Crypto.cpp" />
+    <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Transaction.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="Blockchain.h" />
     <ClInclude Include="Crypto.h" />
+    <ClInclude Include="FileManager.h" />
     <ClInclude Include="Transaction.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>

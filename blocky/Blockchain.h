@@ -16,6 +16,7 @@ public:
 	Block *getGenesis();
 	Block *getLastBlock();
 	Block *getBlock(int index);
+	std::string getFilePath();
 	bool mineLastBlock();
 	void addTransaction(std::string privKey, std::string donor, int amount, std::string recepient);
 	void addBlock();
