@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "Block.h"
+#include "FileManager.h"
 
 class Blockchain {
 	std::string filePath;
@@ -21,4 +22,5 @@ public:
 	void addTransaction(std::string privKey, std::string donor, int amount, std::string recepient);
 	void addBlock();
 	bool validateBlock(int index);
+	void writeTransactionUTXO(int index);
 };

@@ -43,7 +43,7 @@ bool Blockchain::mineLastBlock() {
 
 // adds transaction to the last block
 void Blockchain::addTransaction(std::string privKey, std::string donor, int amount, std::string recepient) {
-	Transaction transaction = Transaction(this->getLastBlock()->getNumTrans() + 1, donor, amount, recepient);
+	Transaction transaction = Transaction(donor, amount, recepient);
 	this->getLastBlock()->addTransaction(transaction, privKey);
 }
 
@@ -72,4 +72,9 @@ bool Blockchain::validateBlock(int index){
 		}
 		return true;
 	}
+}
+
+// write the index'th transaction from the last block to the UTXO file
+void Blockchain::writeTransactionUTXO(int index){
+	FileManager::writeLine(this->getFilePath()+".utxo", this->getLastBlock()->getTransaction(index)->stringify(), 0);
 }
