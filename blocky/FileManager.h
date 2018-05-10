@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <fstream>
+#include <stdio.h>
 
 namespace FileManager{
 	std::string readLine(std::string path, int num);
@@ -9,4 +10,5 @@ namespace FileManager{
 	bool isFile(std::string path);
 	void openFile(std::string path);
 	void deleteLine(std::string path, int index);
+	int getLastLineNum(std::string path);
 }	

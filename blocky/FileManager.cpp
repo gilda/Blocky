@@ -14,41 +14,46 @@ namespace FileManager{
 			}
 
 			file.close();
-			return str;
+			return str+"\n";
 		}else{
 			return "";
 		}
 	}
 
 	// writes mess to path file at specified line
-	// if no file exists it will open a new one
+	// if no file exists does nothing
 	void writeLine(std::string path, std::string mess, int num){
 		if(FileManager::isFile(path)){
-			std::fstream file(path, std::ios::in|std::ios::out);
+			std::fstream file(path, std::ios::in|std::ios::out|std::ios::app);
+
+			std::string tpath = path+"temp";
+			FileManager::openFile(tpath);
+			std::fstream tfile(tpath, std::ios::in|std::ios::out|std::ios::trunc);
+
 			std::string str;
-		
-			file.seekg(0);
-			for(int i = 0; i<num; i++){
-				std::getline(file, str);
+			mess += "\n";
+			int i = 0;
+			file.seekg(0, std::ios::beg);
+			bool empty = true;
+
+			while(empty){
+				if(!std::getline(file, str)){
+					empty = false;
+				}
+				if(i==num){
+					tfile.write(mess.c_str(), mess.length());
+					i++;
+				}else if(str!=""){
+					str += "\n";
+					tfile.write(str.c_str(), str.length());
+					i++;
+				}
 			}
-			file.seekp(file.tellg());
 
-			file.write(mess.c_str(), mess.length());
 			file.close();
-		}else{
-			FileManager::openFile(path);
-			
-			std::fstream file(path, std::ios::in|std::ios::out);
-			std::string str;
-
-			file.seekg(0);
-			for(int i = 0; i<num; i++){
-				std::getline(file, str);
-			}
-			file.seekp(file.tellg());
-
-			file.write(mess.c_str(), mess.length());
-			file.close();
+			tfile.close();
+			remove(path.c_str());
+			rename(tpath.c_str(), path.c_str());
 		}
 	}
 
@@ -72,10 +77,39 @@ namespace FileManager{
 
 	// deletes the index'th line
 	void deleteLine(std::string path, int index){
-		// str = FileManager::readLine(index)
-		// open new file and write all text but str
-		// remove source file
-		// rename temp file to std::streing path
+		std::fstream file(path, std::ios::in|std::ios::out);
+		std::string tpath = path+"temp";
+		FileManager::openFile(tpath);
+		std::fstream tfile(tpath, std::ios::in|std::ios::out|std::ios::trunc);
+		
+		std::string str;
+		std::string erase = FileManager::readLine(path, index);
+		int i=0;
+
+		while(std::getline(file, str)){
+			if(i!=index){
+				tfile.write(str.c_str(), str.length());
+			}
+			i++;
+		}
+
+		file.close();
+		tfile.close();
+		remove(path.c_str());
+		rename(tpath.c_str(), path.c_str());
+
+	}
+
+	int getLastLineNum(std::string path){
+		std::fstream file(path, std::ios::in|std::ios::out);
+		std::string str;
+		int i = 0;
+
+		while(std::getline(file, str)){
+			i++;
+		}
+
+		return i;
 	}
 
 }
