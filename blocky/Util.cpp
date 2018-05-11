@@ -67,19 +67,82 @@ namespace Util {
 		return ss.str();
 	}
 
-	std::string padString(std::string str, int len) {
-		int length = (int)str.length();
-		if (length>len) {
-			return nullptr;
-		}
-		else if (length == len) {
-			return str;
-		}
-		else {
-			for (int i = 0; i < len - length; i++) {
-				str += "0";
+	// returns base58 encoding of hex number
+	std::string base58Encode(std::string hexnum){
+		BIGNUM *num = BN_new();
+		BN_hex2bn(&num, hexnum.c_str()); // convert input to BIGNUM
+										 // all legal chars
+		char alphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+		// init all inside vars
+		BIGNUM *BN58 = BN_new();
+		BIGNUM *div = BN_new();
+		BN_CTX *ctx = BN_CTX_new(); // ctx for div
+		BN_copy(div, num);
+		BN_set_word(BN58, 58); // 58
+		std::string ret;
+
+		if(BN_is_zero(num)){
+			ret = alphabet[0];
+			// return '1' if input is zero
+		} else{
+			BIGNUM *idx = BN_new();
+			while(!BN_is_zero(div)){
+				BN_div(div, idx, num, BN58, ctx); // div = num / 58 , idx = num % 58
+				BN_copy(num, div); // num = div
+				ret = alphabet[std::atoi(BN_bn2dec(idx))]+ret; // add character to the string
 			}
-			return str;
 		}
+		return ret;
 	}
+
+	// returns hex number of base58 encoding
+	std::string base58Decode(std::string str){
+		// reverse the string
+		std::reverse(str.begin(), str.end());
+
+		//init variables and context
+		std::string alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+		BN_CTX *ctx = BN_CTX_new();
+		BN_CTX_start(ctx);
+		unsigned int zeros = 0;
+
+		// count zeros ahead of string base58('0')='1'
+		bool cont = true;
+		while(cont){
+			if(zeros<str.length()&&str.at(zeros)=='1'){ // make sure not going out of bounds
+				zeros++;
+			} else{
+				cont = false;
+			}
+		}
+
+		unsigned int index = 0; // init index of string
+		BIGNUM *dec = BN_new();
+		BIGNUM *multi = BN_new();
+		BIGNUM *inter = BN_new();
+		BIGNUM *indexbn = BN_new();
+		BIGNUM *b58 = BN_new();
+		
+		BN_set_word(b58, 58); // b58 = 58
+		BN_one(multi); // multi = 1
+		BN_zero(dec); // dec = 0
+		
+		while(zeros+index<str.length()){
+			BN_set_word(indexbn, alphabet.find(str.at(index))); // indexbn = alphabet.indexof(str.at(index))
+			BN_mul(inter, multi, indexbn, ctx); // inter = multi * indexbn
+			BN_add(dec, dec, inter); // dec = dec + inter
+			BN_mul(multi, multi, b58, ctx); // multi = multi * 58
+			index++; // increment index for next character
+		}
+
+		std::string ret = BN_bn2hex(dec);
+		// delete leading zeros
+		if(ret.at(0)=='0'){
+			ret.erase(0,1);
+		}
+
+		return ret;
+	}
+
 }
