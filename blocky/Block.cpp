@@ -24,15 +24,16 @@ Block::Block() {
 }
 
 // adding a transaction to the Block
-void Block::addTransaction(Transaction transToAdd, std::string privKey) {
+void Block::addTransaction(std::string pubkey, Transaction transToAdd) {
 	Transaction *temp = new Transaction[this->numTrans+1]; // create larger array
 	for (int i = 0; i < this->numTrans; i++) {
 		//copy the old array of transactions
 		*(temp + i) = *(this->transactions + i);
 	}
 	if(transToAdd.getSignature()==""){
-		transToAdd.sign(privKey);
+		transToAdd.sign(pubkey);
 	}
+
 	*(temp + this->numTrans) = transToAdd; // assign new Transaction
 	this->transactions = temp; // change pointer
 	this->numTrans++; // increment the number of transactions
@@ -115,7 +116,7 @@ std::string Block::getCurrHash() {
 
 // verifies the transaction
 int Block::verifyTransaction(Transaction trans, std::string sig, std::string pubKey) {
-	if (Crypto::verify(trans.stringifyVerify(), sig, pubKey) && trans.getSignature()!="") {
+	if (Crypto::verify(trans.stringifyVerify(), Util::base58Decode(sig), Util::base58Decode(pubKey)) && trans.getSignature()!="") {
 		return 1; // success
 	}else if(trans.getSignature()!=""){
 		return 0; // verify failed

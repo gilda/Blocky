@@ -1,7 +1,2 @@
-﻿  Block.cpp
-  Blockchain.cpp
-  Crypto.cpp
-  Source.cpp
-  Transaction.cpp
-  Generating Code...
-  blocky.vcxproj -> C:\Users\gil\source\repos\blocky\Debug\blocky.exe
+﻿  Source.cpp
+  blocky.vcxproj -> C:\Users\Ronni\source\repos\blocky\Debug\blocky.exe

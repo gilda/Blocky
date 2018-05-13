@@ -17,7 +17,7 @@ public:
 	
 	Block(std::string prevHash, int id);
 	Block();
-	void addTransaction(Transaction transToAdd, std::string privKey);
+	void addTransaction(std::string pubkey, Transaction transToAdd);
 	std::string hashBlock();
 	std::string stringify();
 	std::string toString();

@@ -69,7 +69,7 @@ namespace FileManager{
 	// returns the length of the string in line number num zero based
 	// if file does not exist will return false
 	int getLineLength(std::string path, int num){
-		return FileManager::readLine(path, num).length();
+		return (int)FileManager::readLine(path, num).length();
 	}
 
 	// returns true if file exists else false

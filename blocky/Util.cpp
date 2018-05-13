@@ -129,7 +129,7 @@ namespace Util {
 		BN_zero(dec); // dec = 0
 		
 		while(zeros+index<str.length()){
-			BN_set_word(indexbn, alphabet.find(str.at(index))); // indexbn = alphabet.indexof(str.at(index))
+			BN_set_word(indexbn, (int)alphabet.find(str.at(index))); // indexbn = alphabet.indexof(str.at(index))
 			BN_mul(inter, multi, indexbn, ctx); // inter = multi * indexbn
 			BN_add(dec, dec, inter); // dec = dec + inter
 			BN_mul(multi, multi, b58, ctx); // multi = multi * 58

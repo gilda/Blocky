@@ -17,13 +17,21 @@ namespace Crypto {
 		BIGNUM *x = BN_new();
 		BIGNUM *y = BN_new();
 		EC_POINT_get_affine_coordinates_GFp(EC_KEY_get0_group(key), point, x, y, NULL); // extract to BN
-		return BN_bn2hex(x) + std::to_string(BN_is_odd(y)); // return as string the public key in compressed form
+		std::string ret = BN_bn2hex(x)+std::to_string(BN_is_odd(y));
+		if(ret.at(0)=='0'){
+			ret.erase(0, 1);
+		}
+		return ret; // return as string the public key in compressed form
 	}
 
 	// returns the string of private key given
 	std::string getPrivateString(EC_KEY *key) {
 		const BIGNUM *priv = EC_KEY_get0_private_key(key);
-		return std::string(BN_bn2hex(priv));
+		std::string ret = BN_bn2hex(priv);
+		if(ret.at(0)=='0'){
+			ret.erase(0, 1);
+		}
+		return ret;
 	}
 
 	// return the signature of the message by private key

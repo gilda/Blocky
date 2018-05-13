@@ -19,7 +19,7 @@ public:
 	Block *getBlock(int index);
 	std::string getFilePath();
 	bool mineLastBlock();
-	void addTransaction(std::string privKey, std::string donor, int amount, std::string recepient);
+	void addTransaction(std::string pubkey, std::string donor, int amount, std::string recepient);
 	void addBlock();
 	bool validateBlock(int index);
 	void writeTransactionUTXO(int index);

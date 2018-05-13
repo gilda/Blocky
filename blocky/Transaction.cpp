@@ -31,12 +31,11 @@ std::string Transaction::stringify() {
 // toString prints all info for debugging or viewing
 std::string Transaction::toString() {
 	return 
-		"{HASH"+
-		this->hash + "HASH[" + 
-		this->donor+"] > "+
-		std::to_string(this->amount)+" > ["+
-		this->recipient + "]SIG" +
-		this->signature + "SIG}";
+		"HASH: " + this->hash + "\n" +
+		"donor: " + this->donor + "\n"+ 
+		"amount: " + std::to_string(this->amount) + "\n" +
+		"recepient: " + this->recipient + "\n" +
+		"signature: " + this->signature + "\n";
 }
 
 // returns the transactions without member signature
@@ -51,8 +50,8 @@ std::string Transaction::stringifyVerify() {
 
 // signs the transaction and updates member signature
 int Transaction::sign(std::string privKey) {
-	std::string sign = Crypto::sign(this->stringifyVerify(), privKey); // sign the stringify of Transaction
-	this->signature = sign;
+	std::string sign = Crypto::sign(this->stringifyVerify(), Util::base58Decode(privKey)); // sign the stringify of Transaction
+	this->signature = Util::base58Encode(sign);
 	this->hash = Util::Hash256(this->stringifyVerify());
 	return 1;
 }

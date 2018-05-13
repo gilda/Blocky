@@ -24,12 +24,13 @@ int main() {
 	Blockchain gldc = Blockchain("gldc", 32, 10);
 
 	EC_KEY *key = Crypto::genKey();
-	printf("private key:         %s\n", Crypto::getPrivateString(key).c_str());
-	printf("private key decoded: %s\n", Util::base58Decode(Util::base58Encode(Crypto::getPrivateString(key))).c_str());
-	printf("private key encoded: %s\n\n", Util::base58Encode(Crypto::getPrivateString(key)).c_str());
-	printf("public key :         %s\n", Crypto::getPublicString(key).c_str());
-	printf("public key decoded:  %s\n", Util::base58Decode(Util::base58Encode(Crypto::getPublicString(key))).c_str());
-	printf("public key encoded:  %s\n\n", Util::base58Encode(Crypto::getPublicString(key)).c_str());
+	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 5, Util::base58Encode(Crypto::getPublicString(key)));
+
+	printf("public Key: %s\n", Util::base58Encode(Crypto::getPublicString(key)).c_str());
+	printf("private Key: %s\n", Util::base58Encode(Crypto::getPrivateString(key)).c_str());
+	printf("signature: %s\n", gldc.getLastBlock()->getLastTransaction()->getSignature().c_str());
+	printf("verify: %s\n", gldc.getLastBlock()->verifyTransaction(*gldc.getLastBlock()->getLastTransaction(), gldc.getLastBlock()->getLastTransaction()->getSignature(), Util::base58Encode(Crypto::getPublicString(key)))==1 ? "true" : "false");
+	printf("\ntoString\n\n%s\n", gldc.getLastBlock()->getLastTransaction()->toString().c_str());
 
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");

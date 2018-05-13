@@ -42,9 +42,9 @@ bool Blockchain::mineLastBlock() {
 }
 
 // adds transaction to the last block
-void Blockchain::addTransaction(std::string privKey, std::string donor, int amount, std::string recepient) {
+void Blockchain::addTransaction(std::string pubkey, std::string donor, int amount, std::string recepient) {
 	Transaction transaction = Transaction(donor, amount, recepient);
-	this->getLastBlock()->addTransaction(transaction, privKey);
+	this->getLastBlock()->addTransaction(pubkey, transaction);
 }
 
 // adds a new block to the block chain
