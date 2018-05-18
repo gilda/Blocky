@@ -1,14 +1,15 @@
 #include "Block.h"
 
-// Constructor only dependant on preHash
+// Constructor only dependant on prevHash
 Block::Block(std::string prevHash, int id) {
 	// parameters assigning
 	this->id = id;
 	this->prevHash = prevHash;
 	this->nonce = 0;
 	this->currHash = "";
-	this->numTrans=0;
-	this->transactions = new Transaction[numTrans];
+	this->numTrans = 0;
+	this->transactions = std::vector<Transaction>(0);
+	this->transactions.resize(this->numTrans);
 	this->mined = false;
 }
 
@@ -19,23 +20,16 @@ Block::Block() {
 	this->nonce = 0;
 	this->currHash = "";
 	this->numTrans = 0;
-	this->transactions = new Transaction[numTrans];
+	this->transactions = std::vector<Transaction>(0);
 	this->mined = false;
 }
 
 // adding a transaction to the Block
-void Block::addTransaction(std::string pubkey, Transaction transToAdd) {
-	Transaction *temp = new Transaction[this->numTrans+1]; // create larger array
-	for (int i = 0; i < this->numTrans; i++) {
-		//copy the old array of transactions
-		*(temp + i) = *(this->transactions + i);
-	}
+void Block::addTransaction(std::string prikey, Transaction transToAdd) {
 	if(transToAdd.getSignature()==""){
-		transToAdd.sign(pubkey);
+		transToAdd.sign(prikey);
 	}
-
-	*(temp + this->numTrans) = transToAdd; // assign new Transaction
-	this->transactions = temp; // change pointer
+	this->transactions.push_back(transToAdd);
 	this->numTrans++; // increment the number of transactions
 }
 
@@ -47,8 +41,8 @@ std::string Block::stringify(){
 		std::to_string(this->nonce) + "N" +
 		std::to_string(this->numTrans) + "T:";
 	// loop over all transactions
-	for (int i = 0; i < this->numTrans; i++) {
-		rets += (this->transactions + i)->stringify() + ":";
+	for (std::vector<Transaction>::iterator it=this->transactions.begin(); it!=this->transactions.end(); it++) {
+		rets += it->stringify() + ":";
 	}
 	return rets;
 }
@@ -69,34 +63,45 @@ std::string Block::toString() {
 		"currHash: " + this->currHash + "\r\n" +
 		"numTrans: " + std::to_string(this->numTrans) + "\r\n\r\n";
 	// loop over all transactions
-	for (int i = 0; i < this->numTrans; i++) {
-		rets += std::to_string(i)+": "+(this->transactions + i)->toString() +"\r\n";
+	int index = 0;
+	for(std::vector<Transaction>::iterator it = this->transactions.begin(); it!=this->transactions.end(); it++){
+		rets += std::to_string(index)+": "+it->toString() +"\r\n";
+		index++;
 	}
 	return rets;
 }
 
-bool Block::mine(int difficulty) {
+bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward) {
+	// add coinbase transaction
+	this->addTransaction(minerPrivKey, Transaction(minerPubKey, reward, minerPubKey));
 	puts("starting to mine...");
 	printf("%s", ("raw data:\r\n" + this->stringify() + "\r\n").c_str());
+	// start clock
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 	while (Util::numZeroHash(Util::Hash256(this->stringify()))<difficulty && this->nonce < INT64_MAX) {
 		this->nonce++;
 		this->hashBlock();
 	}
+	// end clock
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	
 	this->mined = true;
 	long long int eTime = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
 	printf("%s", ("elapsed time: "+std::to_string((double)eTime/1000000)+" seconds\r\n\r\n").c_str());
 	return this->mined;
 }
 
-// reutns the last transaction added to the block
+// returns the last transaction added to the block
 Transaction *Block::getLastTransaction() {
-	return this->transactions + this->numTrans - 1;
+	Transaction *ret = &this->transactions.back();
+	return ret;
 }
 
+// returns transaction at given index
 Transaction *Block::getTransaction(int index){
-	return this->transactions+index;
+	Transaction *ret = &(this->transactions.at(index));
+	return ret;
 }
 
 // returns the block id

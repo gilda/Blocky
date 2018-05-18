@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <chrono>
+#include <vector>
 #include "Util.h"
 #include "Transaction.h"
 
@@ -10,7 +11,7 @@ class Block {
 	long long int nonce;
 	bool mined;
 	std::string currHash;
-	Transaction *transactions;
+	std::vector<Transaction> transactions;
 	int numTrans;
 	
 public:
@@ -21,7 +22,7 @@ public:
 	std::string hashBlock();
 	std::string stringify();
 	std::string toString();
-	bool mine(int difficulty);
+	bool mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward);
 	Transaction *getLastTransaction();
 	Transaction *getTransaction(int index);
 	int getId();

@@ -12,29 +12,26 @@ namespace Crypto {
 	}
 
 	// returns the string of public key given
+	// not base58 encoded
 	std::string getPublicString(EC_KEY *key) {
 		const EC_POINT *point = EC_KEY_get0_public_key(key); // get point of public key
 		BIGNUM *x = BN_new();
 		BIGNUM *y = BN_new();
 		EC_POINT_get_affine_coordinates_GFp(EC_KEY_get0_group(key), point, x, y, NULL); // extract to BN
 		std::string ret = BN_bn2hex(x)+std::to_string(BN_is_odd(y));
-		if(ret.at(0)=='0'){
-			ret.erase(0, 1);
-		}
 		return ret; // return as string the public key in compressed form
 	}
 
 	// returns the string of private key given
+	// not base58 encoded
 	std::string getPrivateString(EC_KEY *key) {
 		const BIGNUM *priv = EC_KEY_get0_private_key(key);
 		std::string ret = BN_bn2hex(priv);
-		if(ret.at(0)=='0'){
-			ret.erase(0, 1);
-		}
 		return ret;
 	}
 
 	// return the signature of the message by private key
+	// not base58 encoded
 	std::string sign(std::string message, std::string strPrivKey) {
 		unsigned char hash[SHA256_DIGEST_LENGTH]; // allocate hash char
 		SHA256_CTX sha256;

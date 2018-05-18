@@ -26,7 +26,7 @@ namespace Util {
 	}
 
 
-	// return the number of bytes that are zero. used for mining Blocks
+	// return the number of bits that are zero. used for mining Blocks
 	int numZeroHash(const std::string hash) {
 		int len = 0;
 		for (int i = 0; i < (int)hash.size(); i++) {
@@ -69,77 +69,106 @@ namespace Util {
 
 	// returns base58 encoding of hex number
 	std::string base58Encode(std::string hexnum){
-		BIGNUM *num = BN_new();
-		BN_hex2bn(&num, hexnum.c_str()); // convert input to BIGNUM
-										 // all legal chars
+		// all legal chars
 		char alphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-		// init all inside vars
-		BIGNUM *BN58 = BN_new();
-		BIGNUM *div = BN_new();
-		BN_CTX *ctx = BN_CTX_new(); // ctx for div
-		BN_copy(div, num);
-		BN_set_word(BN58, 58); // 58
-		std::string ret;
-
-		if(BN_is_zero(num)){
-			ret = alphabet[0];
-			// return '1' if input is zero
-		} else{
-			BIGNUM *idx = BN_new();
-			while(!BN_is_zero(div)){
-				BN_div(div, idx, num, BN58, ctx); // div = num / 58 , idx = num % 58
-				BN_copy(num, div); // num = div
-				ret = alphabet[std::atoi(BN_bn2dec(idx))]+ret; // add character to the string
-			}
-		}
-		return ret;
-	}
-
-	// returns hex number of base58 encoding
-	std::string base58Decode(std::string str){
-		// reverse the string
-		std::reverse(str.begin(), str.end());
-
-		//init variables and context
-		std::string alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-		BN_CTX *ctx = BN_CTX_new();
-		BN_CTX_start(ctx);
 		unsigned int zeros = 0;
 
 		// count zeros ahead of string base58('0')='1'
 		bool cont = true;
+		unsigned int i = 0;
 		while(cont){
-			if(zeros<str.length()&&str.at(zeros)=='1'){ // make sure not going out of bounds
+			if(i<hexnum.length() && hexnum.at(i)=='0'){ // make sure not going out of bounds
+				hexnum.erase(i, 1);
 				zeros++;
 			} else{
 				cont = false;
 			}
 		}
 
-		unsigned int index = 0; // init index of string
-		BIGNUM *dec = BN_new();
-		BIGNUM *multi = BN_new();
-		BIGNUM *inter = BN_new();
-		BIGNUM *indexbn = BN_new();
-		BIGNUM *b58 = BN_new();
+		BIGNUM *num = BN_new();
+		BN_hex2bn(&num, hexnum.c_str()); // convert input to BIGNUM
+		std::string ret;
+
+		if(hexnum!=""){
+			// init all inside vars
+			BIGNUM *BN58 = BN_new();
+			BIGNUM *div = BN_new();
+			BN_CTX *ctx = BN_CTX_new(); // ctx for div
+			BN_copy(div, num);
+			BN_set_word(BN58, 58); // 58
+
+			if(BN_is_zero(num)){
+				ret = alphabet[0];
+				// return '1' if input is zero
+			}else{
+				BIGNUM *idx = BN_new();
+				while(!BN_is_zero(div)){
+					BN_div(div, idx, num, BN58, ctx); // div = num / 58 , idx = num % 58
+					BN_copy(num, div); // num = div
+					ret = alphabet[std::atoi(BN_bn2dec(idx))]+ret; // add character to the string
+				}
+			}
+		}
 		
-		BN_set_word(b58, 58); // b58 = 58
-		BN_one(multi); // multi = 1
-		BN_zero(dec); // dec = 0
-		
-		while(zeros+index<str.length()){
-			BN_set_word(indexbn, (int)alphabet.find(str.at(index))); // indexbn = alphabet.indexof(str.at(index))
-			BN_mul(inter, multi, indexbn, ctx); // inter = multi * indexbn
-			BN_add(dec, dec, inter); // dec = dec + inter
-			BN_mul(multi, multi, b58, ctx); // multi = multi * 58
-			index++; // increment index for next character
+		// prepend 1's as they are decoded to zero
+		for(unsigned int i = 0; i<zeros; i++){
+			ret = "1"+ret;
 		}
 
-		std::string ret = BN_bn2hex(dec);
-		// delete leading zeros
-		if(ret.at(0)=='0'){
-			ret.erase(0,1);
+		return ret;
+	}
+
+	// returns hex number of base58 encoding
+	std::string base58Decode(std::string str){
+		// reverse the string
+		unsigned int zeros = 0;
+
+		// count zeros ahead of string base58('0')='1'
+		bool cont = true;
+		unsigned int i = 0;
+		while(cont){
+			if(i<str.length()&&str.at(i)=='1'){ // make sure not going out of bounds
+				str.erase(i,1);
+				zeros++;
+			} else{
+				cont = false;
+			}
+		}
+		std::reverse(str.begin(), str.end());
+		std::string ret;
+		if(str!=""){
+			//init variables and context
+			std::string alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+			BN_CTX *ctx = BN_CTX_new();
+			BN_CTX_start(ctx);
+
+			unsigned int index = 0; // init index of string
+			BIGNUM *dec = BN_new();
+			BIGNUM *multi = BN_new();
+			BIGNUM *inter = BN_new();
+			BIGNUM *indexbn = BN_new();
+			BIGNUM *b58 = BN_new();
+
+			BN_set_word(b58, 58); // b58 = 58
+			BN_one(multi); // multi = 1
+			BN_zero(dec); // dec = 0
+
+			while(zeros+index<str.length()){
+				BN_set_word(indexbn, (int)alphabet.find(str.at(index))); // indexbn = alphabet.indexof(str.at(index))
+				BN_mul(inter, multi, indexbn, ctx); // inter = multi * indexbn
+				BN_add(dec, dec, inter); // dec = dec + inter
+				BN_mul(multi, multi, b58, ctx); // multi = multi * 58
+				index++; // increment index for next character
+			}
+			ret = BN_bn2hex(dec);
+			if(ret.at(0)=='0'){
+				ret.erase(0, 1);
+			}
+		}
+
+		// prepend zeros
+		for(unsigned int i = 0; i<zeros; i++){
+			ret = "0"+ret;
 		}
 
 		return ret;

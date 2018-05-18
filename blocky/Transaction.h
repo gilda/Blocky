@@ -3,6 +3,7 @@
 #include "Crypto.h"
 
 class Transaction {
+	Transaction *input;
 	std::string hash;
 	std::string donor;
 	int amount;
@@ -19,4 +20,6 @@ public:
 	std::string getSignature();
 	std::string getHash();
 	std::string getDonor();
+	std::string getRecipient();
+	int getAmount();
 };

@@ -23,8 +23,8 @@ std::string Transaction::stringify() {
 		"{HASH"+
 		this->hash+"HASH["+
 		this->donor+"]>"+
-		std::to_string(this->amount)+">["+
-		this->recipient+"]SIG"+
+		std::to_string(this->amount)+"<("+
+		this->recipient+")SIG"+
 		this->signature+"SIG}";
 }
 
@@ -43,8 +43,8 @@ std::string Transaction::stringifyVerify() {
 	return 
 		"{["+
 		this->donor+"]>"+
-		std::to_string(this->amount)+">["+
-		this->recipient+"]}";
+		std::to_string(this->amount)+"<("+
+		this->recipient+")}";
 }
 
 
@@ -68,4 +68,12 @@ std::string Transaction::getHash() {
 
 std::string Transaction::getDonor(){
 	return this->donor;
+}
+
+std::string Transaction::getRecipient(){
+	return this->recipient;
+}
+
+int Transaction::getAmount(){
+	return this->amount;
 }
