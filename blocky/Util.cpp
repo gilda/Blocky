@@ -3,6 +3,7 @@
 namespace Util {
 	// initialize OpenSSL crypto library
 	void initOpenSSL() {
+		srand((unsigned)time(0));
 		SSL_library_init();
 		SSL_load_error_strings();
 		ERR_load_BIO_strings();
@@ -172,6 +173,11 @@ namespace Util {
 		}
 
 		return ret;
+	}
+
+	// returns random int between min and max
+	int random(int min, int max){
+		return rand()%max+min;
 	}
 
 }

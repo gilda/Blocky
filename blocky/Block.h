@@ -22,7 +22,7 @@ public:
 	std::string hashBlock();
 	std::string stringify();
 	std::string toString();
-	bool mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward);
+	bool mine(int difficulty, std::string minerPubKey);
 	Transaction *getLastTransaction();
 	Transaction *getTransaction(int index);
 	int getId();

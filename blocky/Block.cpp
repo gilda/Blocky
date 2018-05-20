@@ -71,9 +71,7 @@ std::string Block::toString() {
 	return rets;
 }
 
-bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward) {
-	// add coinbase transaction
-	this->addTransaction(minerPrivKey, Transaction(minerPubKey, reward, minerPubKey));
+bool Block::mine(int difficulty, std::string minerPubKey) {
 	puts("starting to mine...");
 	printf("%s", ("raw data:\r\n" + this->stringify() + "\r\n").c_str());
 	// start clock

@@ -42,13 +42,22 @@ std::string Blockchain::getFilePath(){
 
 // mines last block
 bool Blockchain::mineLastBlock(std::string minerPrivKey, std::string minerPubKey) {
+	// add coinbase
+	std::vector<Transaction> inputMine;
+	this->getLastBlock()->addTransaction(minerPrivKey, Transaction(minerPubKey, this->reward, minerPubKey));
+	inputMine.push_back(Transaction(this->getLastBlock()->getLastTransaction()->getHash(), "", 0, "", ""));
+	this->getLastBlock()->getLastTransaction()->setInput(inputMine);
+	
 	// mine it
-	bool mine = this->getLastBlock()->mine(this->difficulty, minerPrivKey, minerPubKey, this->reward);
+	bool mine = this->getLastBlock()->mine(this->difficulty, minerPubKey);
 	
 	// write into unspent transaction pool
 	for(int i = 0; i<this->getLastBlock()->getNumTrans(); i++){
 		this->writeTransactionUTXO(i);
 	}
+
+	// add new block
+	this->blocks.push_back(Block(this->getLastBlock()->getCurrHash(), this->getLastBlock()->getId()+1));
 
 	return mine;
 }
@@ -57,7 +66,7 @@ bool Blockchain::mineLastBlock(std::string minerPrivKey, std::string minerPubKey
 void Blockchain::addTransaction(std::string prikey, std::string donor, int amount, std::string recepient) {
 	// cant give yourself money
 	if(donor!=recepient){
-		Transaction transaction = Transaction(donor, amount, recepient);
+		Transaction transaction = Transaction(this->getTransInputForValue(donor, amount), "", donor, amount, recepient, "");
 		this->getLastBlock()->addTransaction(prikey, transaction);
 	}
 }
@@ -85,8 +94,8 @@ bool Blockchain::validateBlock(int index){
 }
 
 // returns pointer to array of tranactions on utxo that can be used by pubkey
-std::vector<int> Blockchain::getTransInputForValue(std::string pubKey, int amount){
-	std::vector<int> ret;
+std::vector<Transaction> Blockchain::getTransInputForValue(std::string pubKey, int amount){
+	std::vector<Transaction> ret;
 	if(FileManager::isFile(this->getFilePath()+".utxo")){
 		std::string str;
 		int found=0;
@@ -95,12 +104,16 @@ std::vector<int> Blockchain::getTransInputForValue(std::string pubKey, int amoun
 		// loop over utxo file
 		for(int i = 0; i<length && found<amount; i++){
 			str = FileManager::readLine(this->getFilePath()+".utxo", i);
-			Transaction trans = Transaction(str.substr(str.find("[")+1, str.find("]")-str.find("[")-1), std::stoi(str.substr(str.find(">")+1, str.find("<")-str.find(">")-1).c_str()), str.substr(str.find("(")+1, str.find(")")-str.find("(")-1));
+			Transaction trans = Transaction(str.substr(str.find("{HASH")+5, str.find("HASH[")-str.find("{HASH")-5),
+											str.substr(str.find("[")+1, str.find("]")-str.find("[")-1),
+											std::stoi(str.substr(str.find(">")+1, str.find("<")-str.find(">")-1).c_str()),
+											str.substr(str.find("(")+1, str.find(")")-str.find("(")-1),
+											str.substr(str.find(")SIG")+4, str.find("SIG}")-str.find(")SIG")-4));
 			
 			// transaction belongs to pubKey
 			if(trans.getRecipient()==pubKey){
 				found += trans.getAmount();
-				ret.push_back(i); // add to vector the file line index
+				ret.push_back(trans); // add to vector the file line index
 			}
 		}
 
@@ -115,5 +128,6 @@ void Blockchain::writeTransactionUTXO(int index){
 	if(!FileManager::isFile(this->getFilePath()+".utxo")){
 		FileManager::openFile(this->getFilePath()+".utxo");
 	}
+
 	FileManager::writeLine(this->getFilePath()+".utxo", this->getLastBlock()->getTransaction(index)->stringify(), FileManager::getLastLineNum(this->getFilePath()+".utxo"));
 }

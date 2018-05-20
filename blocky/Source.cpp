@@ -9,15 +9,14 @@
 int main() {
 	//TODO list ordered by importance level
 	//TODO Blockchain: write UTXO file writing \ reading functions
-	//                 make coinbase transactions verify-able
-	//                 delete UTXO lines
-	//				   bool validateBlock(){validate amount of gldc using UTXO file}
+	//                 generate output change transaction
+	//				   bool validateBlock(){validate amount of gldc using UTXO file, validate hashes and validate signatures}
 	//TODO Transaction: make input and outputs
-	//TODO Crypto: setPublicKey(std::string), setPrivateKey(std::string)
+	//TODO Crypto: 
 	//TODO Block: 
-	//TODO CLI:
-	//TODO GUI:
-	//TODO Util:
+	//TODO CLI: 
+	//TODO GUI: 
+	//TODO Util: 
 	//TODO FileManager: 
 
 	Util::initOpenSSL(); // init OpenSSL
@@ -25,12 +24,9 @@ int main() {
 
 	EC_KEY *key = Crypto::genKey();
 	EC_KEY *key1 = Crypto::genKey();
-	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key1)), Util::base58Encode(Crypto::getPublicString(key1)), 5, Util::base58Encode(Crypto::getPublicString(key)));
 	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
-	std::vector<int> p= gldc.getTransInputForValue(Util::base58Encode(Crypto::getPublicString(key)), 12);
-	for(std::vector<int>::iterator it = p.begin(); it != p.end(); it++){
-		printf("%s\n", FileManager::readLine(gldc.getFilePath()+".utxo", *it).c_str());
-	}
+	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 5, Util::base58Encode(Crypto::getPublicString(key1)));
+	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
 
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");

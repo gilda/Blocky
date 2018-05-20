@@ -23,6 +23,6 @@ public:
 	void addTransaction(std::string pubkey, std::string donor, int amount, std::string recepient);
 	void addBlock();
 	bool validateBlock(int index);
-	std::vector<int> getTransInputForValue(std::string pubKey, int amount);
+	std::vector<Transaction> getTransInputForValue(std::string pubKey, int amount);
 	void writeTransactionUTXO(int index);
 };

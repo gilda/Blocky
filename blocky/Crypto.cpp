@@ -30,6 +30,22 @@ namespace Crypto {
 		return ret;
 	}
 
+	// sets the public string of key
+	void setPublicString(EC_KEY *key, std::string pubKey){
+		BIGNUM *pubKeyx = BN_new();
+		BN_hex2bn(&pubKeyx, pubKey.substr(0, 64).c_str()); // parse x part
+		int ybit; // ybit on y is positive or negative
+		sscanf_s(pubKey.substr(64, 1).c_str(), "%d", &ybit); // parse y bit
+		EC_POINT *pubKeyPoint = EC_POINT_new(EC_KEY_get0_group(key)); // init point
+	}
+
+	// sets the private part of key
+	void setPrivateString(EC_KEY *key, std::string privKey){
+		BIGNUM *bnPriv = BN_new();
+		BN_hex2bn(&bnPriv, privKey.c_str()); // parse private key
+		EC_KEY_set_private_key(key, bnPriv); // set private part to parsed BN
+	}
+
 	// return the signature of the message by private key
 	// not base58 encoded
 	std::string sign(std::string message, std::string strPrivKey) {
