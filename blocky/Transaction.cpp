@@ -22,7 +22,17 @@ Transaction::Transaction(std::string hash, std::string donor, int amount, std::s
 }
 
 //parser constructor
-Transaction::Transaction(std::vector<Transaction> input,std::string hash, std::string donor, int amount, std::string recipient, std::string signature){
+Transaction::Transaction(std::vector<Transaction> input,std::string hash, std::string donor, int amount, std::string recipient, std::string signature, int nonce){
+	this->input = input;
+	this->hash = hash;
+	this->donor = donor;
+	this->amount = amount;
+	this->recipient = recipient;
+	this->signature = signature;
+	this->nonce = nonce;
+}
+
+Transaction::Transaction(std::vector<Transaction> input, std::string hash, std::string donor, int amount, std::string recipient, std::string signature){
 	this->input = input;
 	this->hash = hash;
 	this->donor = donor;
@@ -46,7 +56,7 @@ std::string Transaction::stringify() {
 	for(std::vector<Transaction>::iterator it = this->input.begin(); it!=input.end(); it++){
 		ret+=it->getHash() + ",";
 	}
-	ret+=std::to_string(this->nonce)+
+	ret+="N"+std::to_string(this->nonce)+
 		"{HASH"+
 		this->hash+"HASH["+
 		this->donor+"]>"+
@@ -105,14 +115,48 @@ std::string Transaction::getHash() {
 	return this->hash;
 }
 
+// returns the donor
 std::string Transaction::getDonor(){
 	return this->donor;
 }
 
+// returns the recepient
 std::string Transaction::getRecipient(){
 	return this->recipient;
 }
 
+// returns the input vector
+std::vector<Transaction> Transaction::getInput(){
+	return this->input;
+}
+
+// returns amount of tokens transacted
 int Transaction::getAmount(){
 	return this->amount;
+}
+
+// parses the transaction from utxo file
+Transaction Transaction::parseTransaction(std::string file, int index){
+	std::string str = FileManager::readLine(file, index);
+	std::vector<Transaction> input;
+
+	std::string hash = str.substr(0, str.find_first_of(","));
+	while(hash!=""){
+		input.push_back(Transaction(hash, "", 0, "", ""));
+		str.erase(0, str.find_first_of(",")+1);
+		if(str.find_first_of(",")!=-1){
+			hash = str.substr(0, str.find_first_of(","));
+		}else{
+			hash = "";
+		}
+	}
+
+	Transaction parsed = Transaction(input,
+									 str.substr(str.find("{HASH")+5, str.find("HASH[")-str.find("{HASH")-5),
+									 str.substr(str.find("[")+1, str.find("]")-str.find("[")-1),
+									 std::stoi(str.substr(str.find(">")+1, str.find("<")-str.find(">")-1)),
+									 str.substr(str.find("(")+1, str.find(")")-str.find("(")-1),
+									 str.substr(str.find(")SIG")+4, str.find("SIG}")-str.find(")SIG")-4),
+									 std::stoi(str.substr(str.find("N")+1, str.find("{")-1)));
+	return parsed;
 }

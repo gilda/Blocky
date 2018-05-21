@@ -13,6 +13,16 @@ Block::Block(std::string prevHash, int id) {
 	this->mined = false;
 }
 
+// parser constructor
+Block::Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans){
+	this->id = id;
+	this->prevHash = prevHash;
+	this->nonce = nonce;
+	this->currHash = currHash;
+	this->transactions = transactions;
+	this->numTrans = numTrans;
+}
+
 // default constructor
 Block::Block() {
 	this->id = 0;
@@ -33,16 +43,33 @@ void Block::addTransaction(std::string prikey, Transaction transToAdd) {
 	this->numTrans++; // increment the number of transactions
 }
 
-// returns string for hashing and file writing
+// returns string for hashing
 std::string Block::stringify(){
 	std::string rets =
 		std::to_string(this->id) + "#" +
 		this->prevHash + "|" +
 		std::to_string(this->nonce) + "N" +
-		std::to_string(this->numTrans) + "T:";
+		std::to_string(this->numTrans) + "T:\n";
 	// loop over all transactions
-	for (std::vector<Transaction>::iterator it=this->transactions.begin(); it!=this->transactions.end(); it++) {
-		rets += it->stringify() + ":";
+	std::vector<Transaction> trans = this->transactions;
+	for (std::vector<Transaction>::iterator it = trans.begin(); it != trans.end(); it++) {
+		rets += it->stringify() + ":\n";
+	}
+	return rets;
+}
+
+// returns string for BLCK writing
+std::string Block::stringifyBLCK(){
+	std::string rets =
+		std::to_string(this->id)+"#"+
+		this->prevHash+"|"+
+		this->currHash+"^"+
+		std::to_string(this->nonce)+"N"+
+		std::to_string(this->numTrans)+"T:\n";
+	// loop over all transactions
+	std::vector<Transaction> trans = this->transactions;
+	for(std::vector<Transaction>::iterator it = trans.begin(); it!=trans.end(); it++){
+		rets += it->stringify()+":\n";
 	}
 	return rets;
 }
@@ -64,7 +91,8 @@ std::string Block::toString() {
 		"numTrans: " + std::to_string(this->numTrans) + "\r\n\r\n";
 	// loop over all transactions
 	int index = 0;
-	for(std::vector<Transaction>::iterator it = this->transactions.begin(); it!=this->transactions.end(); it++){
+	std::vector<Transaction> trans = this->transactions;
+	for(std::vector<Transaction>::iterator it = trans.begin(); it != trans.end(); it++){
 		rets += std::to_string(index)+": "+it->toString() +"\r\n";
 		index++;
 	}
@@ -102,6 +130,10 @@ Transaction *Block::getTransaction(int index){
 	return ret;
 }
 
+std::vector<Transaction> Block::getTransactionVec(){
+	return this->transactions;
+}
+
 // returns the block id
 int Block::getId() {
 	return this->id;
@@ -126,4 +158,34 @@ int Block::verifyTransaction(Transaction trans, std::string sig, std::string pub
 	}else {
 		return -1; // error
 	}
+}
+
+// parse a block from the BLCK
+Block Block::parseBlock(std::string file, int id){
+	// find correct starting line of block
+	int line = 0;
+	std::string str = FileManager::readLine(file, line);
+	std::string idString = str.substr(0, str.find("#"));
+	while(idString != std::to_string(id)){
+		str = FileManager::readLine(file, line);
+		idString = str.substr(0, str.find("#"));
+		line++;
+	}
+
+	str = FileManager::readLine(file , line-1);
+	std::vector<Transaction> empty(0);
+
+	int numTrans = std::stoi(str.substr(str.find("N")+1, str.find("T")-str.find("N")-1));
+	int idParse = std::stoi(str.substr(0, str.find("#")));
+	std::string prevHash = str.substr(str.find("#")+1, str.find("#")-str.find("|")-1);
+	long long int nonce = std::stoi(str.substr(str.find("^")+1, str.find("N")-str.find("^")-1));
+	std::string currHash = str.substr(str.find("|")+1, str.find("^")-str.find("|")-1);
+
+	Block ret = Block(idParse, prevHash, nonce, currHash, empty, 0);
+
+	for(int i = 0; i < numTrans; i++){
+		ret.addTransaction("", Transaction::parseTransaction(file, line+i));
+	}
+
+	return ret;
 }

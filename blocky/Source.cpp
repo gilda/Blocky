@@ -7,25 +7,29 @@
 #include "FileManager.h"
 
 int main() {
-	//TODO list ordered by importance level
-	//TODO Blockchain: write UTXO file writing \ reading functions
-	//                 generate output change transaction
-	//				   bool validateBlock(){validate amount of gldc using UTXO file, validate hashes and validate signatures}
-	//TODO Transaction: make input and outputs
-	//TODO Crypto: 
-	//TODO Block: 
+	//TODO COMMENT LAST COMMIT!!!
+	//TODO Blockchain: bool validateBlock(Block){validate amount of gldc using UTXO file and BLCK file, validate hashes and validate signatures}
+	//TODO Network:
 	//TODO CLI: 
-	//TODO GUI: 
+	//TODO Block: 
+	//TODO Transaction: 
+	//TODO Crypto: 
+	//TODO GUI:
 	//TODO Util: 
-	//TODO FileManager: 
+	//TODO FileManager:
 
 	Util::initOpenSSL(); // init OpenSSL
-	Blockchain gldc = Blockchain("gldc", 32, 10, 10);
+	Blockchain gldc = Blockchain("gldc", 16, 10);
+	remove((gldc.getFilePath()+".utxo").c_str());
+	remove((gldc.getFilePath()+".blck").c_str());
 
 	EC_KEY *key = Crypto::genKey();
 	EC_KEY *key1 = Crypto::genKey();
+	
 	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
-	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 5, Util::base58Encode(Crypto::getPublicString(key1)));
+	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
+	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
+	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key1)), Util::base58Encode(Crypto::getPublicString(key1)), 6, Util::base58Encode(Crypto::getPublicString(key)));
 	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
 
 	Util::cleanupOpenSSL(); // CleanUp SSL

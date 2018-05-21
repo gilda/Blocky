@@ -7,13 +7,12 @@ class Blockchain {
 	std::string filePath;
 	int numBlocks;
 	std::vector<Block> blocks;
-	int MAX_TRANS;
 	int difficulty;
 	int reward;
 
 public:
 
-	Blockchain(std::string filePath, int difficulty, int MAX_TRANS, int reward);
+	Blockchain(std::string filePath, int difficulty, int reward);
 	void createGenesis();
 	Block *getGenesis();
 	Block *getLastBlock();
@@ -25,4 +24,8 @@ public:
 	bool validateBlock(int index);
 	std::vector<Transaction> getTransInputForValue(std::string pubKey, int amount);
 	void writeTransactionUTXO(int index);
+	void writeLastBlock();
+	Transaction getTransactionByHashUTXO(std::string hash);
+	bool validateBlock(Block vBlock);
+	Block parseBlock(int id);
 };

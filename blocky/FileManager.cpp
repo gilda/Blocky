@@ -49,12 +49,11 @@ namespace FileManager{
 				}
 				if(i==num){
 					tfile.write(mess.c_str(), mess.length());
-					i++;
 				}else if(str!=""){
 					str += "\n";
 					tfile.write(str.c_str(), str.length());
-					i++;
 				}
+				i++;
 			}
 			
 			// close file handles
@@ -101,6 +100,7 @@ namespace FileManager{
 		// copy all lines but index to temp file
 		while(std::getline(file, str)){
 			if(i!=index){
+				str += "\n";
 				tfile.write(str.c_str(), str.length());
 			}
 			i++;
