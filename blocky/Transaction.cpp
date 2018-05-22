@@ -94,6 +94,7 @@ std::string Transaction::stringifyVerify() {
 
 // signs the transaction and updates member signature
 int Transaction::sign(std::string privKey) {
+	// sign the verified message with secp256 ECDSA
 	std::string sign = Crypto::sign(this->stringifyVerify(), Util::base58Decode(privKey)); // sign the stringify of Transaction
 	this->signature = Util::base58Encode(sign);
 	this->hash = Util::Hash256(this->stringify());
@@ -102,6 +103,7 @@ int Transaction::sign(std::string privKey) {
 
 // set the input vector
 void Transaction::setInput(std::vector<Transaction> input){
+	// set input vector
 	this->input = input;
 }
 
@@ -137,11 +139,14 @@ int Transaction::getAmount(){
 
 // parses the transaction from utxo file
 Transaction Transaction::parseTransaction(std::string file, int index){
+	// read the requested Line
 	std::string str = FileManager::readLine(file, index);
 	std::vector<Transaction> input;
 
+	// find all input hashes
 	std::string hash = str.substr(0, str.find_first_of(","));
 	while(hash!=""){
+		// insert new hash to vector
 		input.push_back(Transaction(hash, "", 0, "", ""));
 		str.erase(0, str.find_first_of(",")+1);
 		if(str.find_first_of(",")!=-1){
@@ -151,6 +156,7 @@ Transaction Transaction::parseTransaction(std::string file, int index){
 		}
 	}
 
+	// parse using delimiter of utxo file
 	Transaction parsed = Transaction(input,
 									 str.substr(str.find("{HASH")+5, str.find("HASH[")-str.find("{HASH")-5),
 									 str.substr(str.find("[")+1, str.find("]")-str.find("[")-1),

@@ -53,8 +53,9 @@ bool Blockchain::mineLastBlock(std::string minerPrivKey, std::string minerPubKey
 	// delete unspent transaction pool
 	if(this->getLastBlock()->getId() != 0){
 		std::vector<Transaction> trans = this->getLastBlock()->getTransactionVec();
+		// loop over all transactions in last mined block
 		for(std::vector<Transaction>::iterator it = trans.begin(); it!=trans.end(); it++){
-
+			// loop over all file
 			for(int i = 0; i<FileManager::getLastLineNum(this->getFilePath()+".utxo"); i++){
 				std::string str = FileManager::readLine(this->getFilePath()+".utxo", i);
 				Transaction utxo = Transaction(str.substr(str.find("{HASH")+5, str.find("HASH[")-str.find("{HASH")-5),
@@ -62,8 +63,10 @@ bool Blockchain::mineLastBlock(std::string minerPrivKey, std::string minerPubKey
 					std::stoi(str.substr(str.find(">")+1, str.find("<")-str.find(">")-1).c_str()),
 					str.substr(str.find("(")+1, str.find(")")-str.find("(")-1),
 					str.substr(str.find(")SIG")+4, str.find("SIG}")-str.find(")SIG")-4));
+				
 				std::vector<Transaction> input = it->getInput();
-					
+				
+				// delete all inputs of transaction in last block
 				for(std::vector<Transaction>::iterator inpt = input.begin(); inpt != input.end(); inpt++){
 					if(utxo.getHash() == inpt->getHash()){
 						FileManager::deleteLine(this->getFilePath()+".utxo", i);
@@ -92,15 +95,19 @@ bool Blockchain::mineLastBlock(std::string minerPrivKey, std::string minerPubKey
 void Blockchain::addTransaction(std::string prikey, std::string donor, int amount, std::string recepient) {
 	// cant give yourself money
 	if(donor!=recepient){
+		// create transaction and transaction input for it
 		std::vector<Transaction> input = this->getTransInputForValue(donor, amount);
 		Transaction transaction = Transaction(input, "", donor, amount, recepient, "");
 		int paid = 0;
 
+		// find all of paid amount in inputs and calculate change
 		for(std::vector<Transaction>::iterator it = input.begin(); it != input.end(); it++){
 			paid += it->getAmount();
 		}
 		this->getLastBlock()->addTransaction(prikey, transaction);
+		
 		if(paid-amount!=0){
+			// create and add the change transaction
 			std::vector<Transaction> changeInput;
 			changeInput.push_back((Transaction(this->getLastBlock()->getLastTransaction()->getHash(), "", 0, "", "")));
 			this->getLastBlock()->addTransaction(prikey, Transaction(changeInput, "", donor, paid-amount, donor, ""));
@@ -114,12 +121,7 @@ void Blockchain::addBlock() {
 	this->numBlocks++;
 }
 
-// returns true or false for the block TODO
-bool Blockchain::validateBlock(int index){
-	return false;
-}
-
-// returns pointer to array of tranactions on utxo that can be used by pubkey
+// returns vector of input that a transaction can use
 std::vector<Transaction> Blockchain::getTransInputForValue(std::string pubKey, int amount){
 	std::vector<Transaction> ret;
 	if(FileManager::isFile(this->getFilePath()+".utxo")){
@@ -154,7 +156,7 @@ void Blockchain::writeTransactionUTXO(int index){
 	if(!FileManager::isFile(this->getFilePath()+".utxo")){
 		FileManager::openFile(this->getFilePath()+".utxo");
 	}
-
+	// write the UTXO for Transaction stringify
 	FileManager::writeLine(this->getFilePath()+".utxo", this->getLastBlock()->getTransaction(index)->stringify(), FileManager::getLastLineNum(this->getFilePath()+".utxo"));
 }
 
@@ -162,38 +164,27 @@ void Blockchain::writeLastBlock(){
 	if(!FileManager::isFile(this->getFilePath()+".blck")){
 		FileManager::openFile(this->getFilePath()+".blck");
 	}
-
+	// write the block BLCK format
 	FileManager::writeLine(this->getFilePath()+".blck", this->getLastBlock()->stringifyBLCK(), FileManager::getLastLineNum(this->getFilePath()+".blck"));
 }
 
+// returns a transaction given the hash of it in UTXO format
 Transaction Blockchain::getTransactionByHashUTXO(std::string hash){
-	std::string str;
 	Transaction trans;
 	int line = 0;
+	// loop over file to find the hash of the transaction
 	while(hash!=trans.getHash() && line <= FileManager::getLastLineNum(this->getFilePath()+".utxo")){
-		str = FileManager::readLine(this->getFilePath()+".utxo", line);
-
-		trans = Transaction(str.substr(str.find("{HASH")+5, str.find("HASH[")-str.find("{HASH")-5),
-			str.substr(str.find("[")+1, str.find("]")-str.find("[")-1),
-			std::stoi(str.substr(str.find(">")+1, str.find("<")-str.find(">")-1).c_str()),
-			str.substr(str.find("(")+1, str.find(")")-str.find("(")-1),
-			str.substr(str.find(")SIG")+4, str.find("SIG}")-str.find(")SIG")-4));
+		trans = Transaction::parseTransaction(this->getFilePath()+".utxo", line);
 		line++;
 	}
 
-	if(line > FileManager::getLastLineNum(this->getFilePath()+".utxo") + 1){
+	// return empty transaction if not found
+	if(line > FileManager::getLastLineNum(this->getFilePath()+".utxo")){
 		return Transaction();
 	}
 
 	return trans;
 }
-
-
-Block Blockchain::parseBlock(int id){
-	Block ret = Block();
-	return ret;
-}
-
 
 bool Blockchain::validateBlock(Block vBlock){
 	if(vBlock.stringify().substr(vBlock.stringify().find("#")+1, vBlock.stringify().find("|")-vBlock.stringify().find("#")-1)!=Util::Hash256(vBlock.stringify())){

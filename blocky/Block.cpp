@@ -164,6 +164,7 @@ int Block::verifyTransaction(Transaction trans, std::string sig, std::string pub
 Block Block::parseBlock(std::string file, int id){
 	// find correct starting line of block
 	int line = 0;
+	// read the line
 	std::string str = FileManager::readLine(file, line);
 	std::string idString = str.substr(0, str.find("#"));
 	while(idString != std::to_string(id)){
@@ -175,6 +176,7 @@ Block Block::parseBlock(std::string file, int id){
 	str = FileManager::readLine(file , line-1);
 	std::vector<Transaction> empty(0);
 
+	// parse all parameters using delimeters in BLCK file
 	int numTrans = std::stoi(str.substr(str.find("N")+1, str.find("T")-str.find("N")-1));
 	int idParse = std::stoi(str.substr(0, str.find("#")));
 	std::string prevHash = str.substr(str.find("#")+1, str.find("#")-str.find("|")-1);
@@ -183,6 +185,7 @@ Block Block::parseBlock(std::string file, int id){
 
 	Block ret = Block(idParse, prevHash, nonce, currHash, empty, 0);
 
+	// add all transactions to the block
 	for(int i = 0; i < numTrans; i++){
 		ret.addTransaction("", Transaction::parseTransaction(file, line+i));
 	}

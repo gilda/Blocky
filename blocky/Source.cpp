@@ -9,10 +9,10 @@
 int main() {
 	//TODO COMMENT LAST COMMIT!!!
 	//TODO Blockchain: bool validateBlock(Block){validate amount of gldc using UTXO file and BLCK file, validate hashes and validate signatures}
+	//TODO Block: bool empty()
+	//TODO Transaction: bool empty()
 	//TODO Network:
 	//TODO CLI: 
-	//TODO Block: 
-	//TODO Transaction: 
 	//TODO Crypto: 
 	//TODO GUI:
 	//TODO Util: 
