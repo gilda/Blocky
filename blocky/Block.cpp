@@ -149,6 +149,10 @@ std::string Block::getCurrHash() {
 	return this->currHash;
 }
 
+std::string Block::getPrevHash(){
+	return this->prevHash;
+}
+
 // verifies the transaction
 int Block::verifyTransaction(Transaction trans, std::string sig, std::string pubKey) {
 	if (Crypto::verify(trans.stringifyVerify(), Util::base58Decode(sig), Util::base58Decode(pubKey)) && trans.getSignature()!="") {
@@ -179,7 +183,7 @@ Block Block::parseBlock(std::string file, int id){
 	// parse all parameters using delimeters in BLCK file
 	int numTrans = std::stoi(str.substr(str.find("N")+1, str.find("T")-str.find("N")-1));
 	int idParse = std::stoi(str.substr(0, str.find("#")));
-	std::string prevHash = str.substr(str.find("#")+1, str.find("#")-str.find("|")-1);
+	std::string prevHash = str.substr(str.find("#")+1, str.find("|")-str.find("#")-1);
 	long long int nonce = std::stoi(str.substr(str.find("^")+1, str.find("N")-str.find("^")-1));
 	std::string currHash = str.substr(str.find("|")+1, str.find("^")-str.find("|")-1);
 
@@ -191,4 +195,8 @@ Block Block::parseBlock(std::string file, int id){
 	}
 
 	return ret;
+}
+
+bool Block::empty(){
+	return (this->id==0 && this->prevHash=="" && this->nonce==0 && this->currHash=="" && this->numTrans==0 && this->mined==false && this->transactions.empty());
 }

@@ -31,6 +31,8 @@ public:
 	int getId();
 	int getNumTrans();
 	std::string getCurrHash();
+	std::string getPrevHash();
 	int verifyTransaction(Transaction trans, std::string sig, std::string pubKey);
 	static Block parseBlock(std::string file, int id);
+	bool empty();
 };

@@ -31,4 +31,5 @@ public:
 	std::vector<Transaction> getInput();
 	int getAmount();
 	static Transaction parseTransaction(std::string file, int index);
+	bool empty();
 };

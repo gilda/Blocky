@@ -166,3 +166,7 @@ Transaction Transaction::parseTransaction(std::string file, int index){
 									 std::stoi(str.substr(str.find("N")+1, str.find("{")-1)));
 	return parsed;
 }
+
+bool Transaction::empty(){
+	return (this->input.empty() && this->hash=="" && this->donor=="" && this->amount==0 && this->recipient=="" && this->signature=="");
+}

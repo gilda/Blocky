@@ -186,8 +186,13 @@ Transaction Blockchain::getTransactionByHashUTXO(std::string hash){
 	return trans;
 }
 
-bool Blockchain::validateBlock(Block vBlock){
-	if(vBlock.stringify().substr(vBlock.stringify().find("#")+1, vBlock.stringify().find("|")-vBlock.stringify().find("#")-1)!=Util::Hash256(vBlock.stringify())){
+bool Blockchain::validateBlockHashes(Block vBlock){
+	// hash is not correct
+	if(vBlock.getCurrHash()!=Util::Hash256(vBlock.stringify())){
+		return false;
+	}
+	// block or last block were not mined properly
+	if(Util::numZeroHash(vBlock.getCurrHash()) < this->difficulty || Util::numZeroHash(vBlock.getPrevHash()) < this->difficulty){
 		return false;
 	}
 	return true;

@@ -7,14 +7,14 @@
 #include "FileManager.h"
 
 int main() {
-	//TODO COMMENT LAST COMMIT!!!
-	//TODO Blockchain: bool validateBlock(Block){validate amount of gldc using UTXO file and BLCK file, validate hashes and validate signatures}
-	//TODO Block: bool empty()
-	//TODO Transaction: bool empty()
+	//TODO ordered by importance
+	//TODO Blockchain: bool validateBlock(Block){validate amount of gldc using UTXO file and BLCK file, validate signatures}
+	//TODO Block: check Block::mined use
 	//TODO Network:
 	//TODO CLI: 
-	//TODO Crypto: 
 	//TODO GUI:
+	//TODO Transaction: 
+	//TODO Crypto: 
 	//TODO Util: 
 	//TODO FileManager:
 
