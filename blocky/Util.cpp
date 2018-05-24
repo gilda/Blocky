@@ -79,7 +79,8 @@ namespace Util {
 		unsigned int i = 0;
 		while(cont){
 			if(i<hexnum.length() && hexnum.at(i)=='0'){ // make sure not going out of bounds
-				hexnum.erase(i, 1);
+				//hexnum.erase(i, 1);
+				i++;
 				zeros++;
 			} else{
 				cont = false;
@@ -129,12 +130,14 @@ namespace Util {
 		unsigned int i = 0;
 		while(cont){
 			if(i<str.length()&&str.at(i)=='1'){ // make sure not going out of bounds
-				str.erase(i,1);
+				//str.erase(i,1);
+				i++;
 				zeros++;
 			} else{
 				cont = false;
 			}
 		}
+
 		std::reverse(str.begin(), str.end());
 		std::string ret;
 		if(str!=""){

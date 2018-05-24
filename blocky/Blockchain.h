@@ -26,4 +26,6 @@ public:
 	void writeLastBlock();
 	Transaction getTransactionByHashUTXO(std::string hash);
 	bool validateBlockHashes(Block vBlock);
+	bool validateBlockTransactionSig(Block vBlock);
+	bool validateLastBlockUTXO();
 };

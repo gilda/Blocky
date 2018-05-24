@@ -4,7 +4,7 @@
 Blockchain::Blockchain(std::string filePath, int difficulty, int reward) {
 	this->filePath = filePath;
 	this->difficulty = difficulty;
-	this->numBlocks = 1;
+	this->numBlocks = 0;
 	this->reward = reward;
 	// create genesis
 	this->createGenesis();
@@ -13,7 +13,7 @@ Blockchain::Blockchain(std::string filePath, int difficulty, int reward) {
 
 // creates the first block
 void Blockchain::createGenesis() {
-	this->blocks = std::vector<Block>(this->numBlocks, Block(Util::Hash256(this->getFilePath()), this->numBlocks-1));
+	this->blocks = std::vector<Block>(1, Block(Util::Hash256(this->getFilePath()), this->numBlocks));
 }
 
 // gets the first block
@@ -87,6 +87,7 @@ bool Blockchain::mineLastBlock(std::string minerPrivKey, std::string minerPubKey
 
 	// add new block
 	this->blocks.push_back(Block(this->getLastBlock()->getCurrHash(), this->getLastBlock()->getId()+1));
+	this->numBlocks++;
 
 	return mine;
 }
@@ -186,6 +187,7 @@ Transaction Blockchain::getTransactionByHashUTXO(std::string hash){
 	return trans;
 }
 
+// validate that all the hashes in the block are valid and correct
 bool Blockchain::validateBlockHashes(Block vBlock){
 	// hash is not correct
 	if(vBlock.getCurrHash()!=Util::Hash256(vBlock.stringify())){
@@ -195,5 +197,33 @@ bool Blockchain::validateBlockHashes(Block vBlock){
 	if(Util::numZeroHash(vBlock.getCurrHash()) < this->difficulty || Util::numZeroHash(vBlock.getPrevHash()) < this->difficulty){
 		return false;
 	}
+	// all transaction hashes are correct
+	std::vector<Transaction> trans = vBlock.getTransactionVec();
+	for(std::vector<Transaction>::iterator it = trans.begin(); it != trans.end(); it++){
+		// hash transaction
+		if(it->getHash() != Util::Hash256(it->stringifyVerify())){
+			return false;
+		}
+	}
+	return true;
+}
+
+// validate that all signatures in the block are valid and correct
+bool Blockchain::validateBlockTransactionSig(Block vBlock){
+	std::vector<Transaction> trans = vBlock.getTransactionVec();
+	// loop over all transactions
+	for(std::vector<Transaction>::iterator it = trans.begin(); it!=trans.end(); it++){
+		if(Crypto::verify(it->stringifyVerify(), Util::base58Decode(it->getSignature()), Util::base58Decode(it->getDonor())) != 1){
+			return false;
+		}
+	}
+	return true;
+}
+
+// checks the incoming block's utxo use
+bool Blockchain::validateLastBlockUTXO(){
+	Block vBlock = Block::parseBlock(this->getFilePath()+".blck", this->numBlocks-1);
+	std::vector<Transaction> trans = vBlock.getTransactionVec();
+	
 	return true;
 }

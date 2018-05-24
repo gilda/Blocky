@@ -32,6 +32,8 @@ int main() {
 	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key1)), Util::base58Encode(Crypto::getPublicString(key1)), 6, Util::base58Encode(Crypto::getPublicString(key)));
 	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
 
+	printf("block utxo validation: %s\n", gldc.validateLastBlockUTXO() == true ? "True" : "False");
+
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");
 	return 0; // exit Process

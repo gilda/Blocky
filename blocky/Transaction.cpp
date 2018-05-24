@@ -97,7 +97,7 @@ int Transaction::sign(std::string privKey) {
 	// sign the verified message with secp256 ECDSA
 	std::string sign = Crypto::sign(this->stringifyVerify(), Util::base58Decode(privKey)); // sign the stringify of Transaction
 	this->signature = Util::base58Encode(sign);
-	this->hash = Util::Hash256(this->stringify());
+	this->hash = Util::Hash256(this->stringifyVerify());
 	return 1;
 }
 
