@@ -13,19 +13,17 @@ class Blockchain {
 public:
 
 	Blockchain(std::string filePath, int difficulty, int reward);
-	void createGenesis();
 	Block *getGenesis();
 	Block *getLastBlock();
 	Block *getBlock(int index);
+	int getDifficulty();
+	int getReward();
 	std::string getFilePath();
-	bool mineLastBlock(std::string minerPrivKey, std::string minerPubKey);
-	void addTransaction(std::string pubkey, std::string donor, int amount, std::string recepient);
-	void addBlock();
-	std::vector<Transaction> getTransInputForValue(std::string pubKey, int amount);
-	void writeTransactionUTXO(int index);
+	void addBlock(Block blockToAdd);
+	void writeTransactionUTXO(Transaction trans);
 	void writeLastBlock();
 	Transaction getTransactionByHashUTXO(std::string hash);
 	bool validateBlockHashes(Block vBlock);
 	bool validateBlockTransactionSig(Block vBlock);
-	bool validateLastBlockUTXO();
+	bool validateLastBlockUTXO(Block vBlock);
 };

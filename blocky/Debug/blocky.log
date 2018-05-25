@@ -1,9 +1,6 @@
 ﻿  Block.cpp
   Blockchain.cpp
-  Crypto.cpp
-  FileManager.cpp
   Source.cpp
   Transaction.cpp
-  Util.cpp
   Generating Code...
   blocky.vcxproj -> C:\Users\gil\source\repos\blocky\Debug\blocky.exe

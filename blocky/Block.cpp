@@ -35,12 +35,29 @@ Block::Block() {
 }
 
 // adding a transaction to the Block
-void Block::addTransaction(std::string prikey, Transaction transToAdd) {
-	if(transToAdd.getSignature()==""){
+void Block::addTransaction(std::string file, std::string prikey, std::string donor, int amount, std::string recepient) {
+	if(donor!=recepient){
+		std::vector<Transaction> input = this->getTransInputForValue(file, donor, amount);
+		Transaction transToAdd = Transaction(donor, amount, recepient);
+		transToAdd.setInput(input);
 		transToAdd.sign(prikey);
+		int paid = 0;
+		
+		for(std::vector<Transaction>::iterator it = input.begin(); it!=input.end(); it++){
+			paid += it->getAmount();
+		}
+		this->transactions.push_back(transToAdd);
+		this->numTrans++; // increment the number of transactions
+
+		if(paid-amount!=0){
+			// create and add the change transaction
+			Transaction change = Transaction(input, "", donor, paid-amount, donor, "");
+			change.sign(prikey);
+			this->transactions.push_back(change);
+			this->numTrans++; // increment the number of transactions
+		}
 	}
-	this->transactions.push_back(transToAdd);
-	this->numTrans++; // increment the number of transactions
+
 }
 
 // returns string for hashing
@@ -99,7 +116,15 @@ std::string Block::toString() {
 	return rets;
 }
 
-bool Block::mine(int difficulty, std::string minerPubKey) {
+bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward) {
+	// add coinbase
+	std::vector<Transaction> inputMine;
+	Transaction coinbase = Transaction(minerPubKey, reward, minerPubKey);
+	coinbase.sign(minerPrivKey);
+	coinbase.setInput(std::vector<Transaction>(1, Transaction(coinbase.getHash(), "", 0, "", "")));
+	this->transactions.push_back(coinbase);
+	this->numTrans++;
+
 	puts("starting to mine...");
 	printf("%s", ("raw data:\r\n" + this->stringify() + "\r\n").c_str());
 	// start clock
@@ -177,7 +202,7 @@ Block Block::parseBlock(std::string file, int id){
 		line++;
 	}
 
-	str = FileManager::readLine(file , line-1);
+	str = FileManager::readLine(file , line==0 ? 0 : line-1);
 	std::vector<Transaction> empty(0);
 
 	// parse all parameters using delimeters in BLCK file
@@ -191,7 +216,7 @@ Block Block::parseBlock(std::string file, int id){
 
 	// add all transactions to the block
 	for(int i = 0; i < numTrans; i++){
-		ret.addTransaction("", Transaction::parseTransaction(file, line+i));
+		ret.getTransactionVec().push_back(Transaction::parseTransaction(file, line+i));
 	}
 
 	return ret;
@@ -199,4 +224,28 @@ Block Block::parseBlock(std::string file, int id){
 
 bool Block::empty(){
 	return (this->id==0 && this->prevHash=="" && this->nonce==0 && this->currHash=="" && this->numTrans==0 && this->mined==false && this->transactions.empty());
+}
+
+// returns vector of input that a transaction can use
+std::vector<Transaction> Block::getTransInputForValue(std::string file, std::string pubKey, int amount){
+	std::vector<Transaction> ret;
+	if(FileManager::isFile(file+".utxo")){
+		std::string str;
+		int found = 0;
+		int length = FileManager::getLastLineNum(file+".utxo");
+
+		// loop over utxo file
+		for(int i = 0; i<length && found<amount; i++){
+			Transaction trans = Transaction::parseTransaction(file+".utxo", i);
+
+			// transaction belongs to pubKey
+			if(trans.getRecipient()==pubKey){
+				found += trans.getAmount();
+				ret.push_back(trans); // add to vector the file line index
+			}
+		}
+
+		return ret;
+	}
+	return ret;
 }

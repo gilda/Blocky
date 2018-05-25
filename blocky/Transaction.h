@@ -32,4 +32,5 @@ public:
 	int getAmount();
 	static Transaction parseTransaction(std::string file, int index);
 	bool empty();
+	bool operator==(Transaction);
 };

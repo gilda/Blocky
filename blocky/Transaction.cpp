@@ -85,7 +85,7 @@ std::string Transaction::toString() {
 // returns the transactions without member signature
 std::string Transaction::stringifyVerify() {
 	return 
-		"{["+
+		"N"+std::to_string(this->nonce)+"{["+
 		this->donor+"]>"+
 		std::to_string(this->amount)+"<("+
 		this->recipient+")}";
@@ -169,4 +169,8 @@ Transaction Transaction::parseTransaction(std::string file, int index){
 
 bool Transaction::empty(){
 	return (this->input.empty() && this->hash=="" && this->donor=="" && this->amount==0 && this->recipient=="" && this->signature=="");
+}
+
+bool Transaction::operator==(Transaction rhs){
+	return (this->donor==rhs.getDonor() && this->hash==rhs.getHash() && this->recipient == this->getRecipient() && this->signature == rhs.getSignature() && this->amount == rhs.getAmount());
 }

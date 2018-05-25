@@ -8,8 +8,10 @@
 
 int main() {
 	//TODO ordered by importance
-	//TODO Blockchain: bool validateBlock(Block){validate amount of gldc using UTXO file and BLCK file, validate signatures}
-	//TODO Block: check Block::mined use
+	//TODO COMMENT LAST COMMIT!
+	//TODO Blockchain: validateLastBlockUTXO() check for change transaction
+	//                 break the validation algo
+	//TODO Block: make Block constructable without blockchain object
 	//TODO Network:
 	//TODO CLI: 
 	//TODO GUI:
@@ -26,13 +28,19 @@ int main() {
 	EC_KEY *key = Crypto::genKey();
 	EC_KEY *key1 = Crypto::genKey();
 	
-	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
-	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
-	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
-	gldc.addTransaction(Util::base58Encode(Crypto::getPrivateString(key1)), Util::base58Encode(Crypto::getPublicString(key1)), 6, Util::base58Encode(Crypto::getPublicString(key)));
-	gldc.mineLastBlock(Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)));
+	Block b0 = Block(Util::Hash256(gldc.getFilePath()), 0);
+	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	gldc.addBlock(b0);
 
-	printf("block utxo validation: %s\n", gldc.validateLastBlockUTXO() == true ? "True" : "False");
+	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
+	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
+	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	gldc.addBlock(b1);
+
+	Block b2 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
+	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key1)), Util::base58Encode(Crypto::getPublicString(key1)), 6, Util::base58Encode(Crypto::getPublicString(key)));
+	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	gldc.addBlock(b2);
 
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");
