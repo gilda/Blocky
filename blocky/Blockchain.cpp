@@ -184,6 +184,28 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 						}
 					}
 				}
+				int got = 0;
+				for(std::vector<Transaction>::iterator twin = trans.begin(); twin!=trans.end(); twin++){
+					
+					if(twin->getInput().at(0).getHash()==it->getInput().at(0).getHash()){
+						std::vector<Transaction> twinInput = twin->getInput();
+						
+						for(std::vector<Transaction>::iterator twinInpt = twinInput.begin(); twinInpt!=twinInput.end(); twinInpt++){
+							
+							for(int i = 0; i<FileManager::getLastLineNum(this->getFilePath()+".utxo"); i++){
+								
+								Transaction transaction = Transaction::parseTransaction(this->getFilePath()+".utxo", i);
+								if(transaction.getHash()==twinInpt->getHash()){
+									got += twinInpt->getAmount();
+								}
+							}
+						}
+						break;
+					}
+				}
+				if(got!=paid){
+					return false;
+				}
 			}
 		}
 	}
