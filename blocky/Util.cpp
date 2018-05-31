@@ -15,7 +15,6 @@ namespace Util {
 		FIPS_mode_set(0);
 		CRYPTO_set_locking_callback(nullptr);
 		CRYPTO_set_id_callback(nullptr);
-		ERR_remove_state(0);
 		SSL_COMP_free_compression_methods();
 		ENGINE_cleanup();
 		CONF_modules_free();

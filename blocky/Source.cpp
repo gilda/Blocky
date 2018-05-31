@@ -9,11 +9,10 @@
 int main() {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO Blockchain: validateLastBlockUTXO() check for change transaction
-	//                 break the validation algo
-	//TODO Block: make Block constructable without blockchain object
 	//TODO Network:
 	//TODO CLI: 
+	//TODO Block: 
+	//TODO Blockchain: 
 	//TODO GUI:
 	//TODO Transaction: 
 	//TODO Crypto: 
@@ -33,12 +32,12 @@ int main() {
 	gldc.addBlock(b0);
 
 	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
-	//b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
+	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
 	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
 	gldc.addBlock(b1);
 
 	Block b2 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
-	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 16, Util::base58Encode(Crypto::getPublicString(key1)));
+	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
 	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
 	gldc.addBlock(b2);
 

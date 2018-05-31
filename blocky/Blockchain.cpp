@@ -45,10 +45,13 @@ std::string Blockchain::getFilePath(){
 // adds a new empty block to the block chain
 void Blockchain::addBlock(Block blockToAdd) {
 	if(this->validateBlockHashes(blockToAdd) != true){
+		printf("hash wrong!\n");
 		return;
 	}else if(this->validateBlockTransactionSig(blockToAdd) != true){
+		printf("tx signatures wrong!\n");
 		return;
 	}else if(this->validateLastBlockUTXO(blockToAdd) != true){
+		printf("last block utxo wrong!\n");
 		return;
 	}
 	
