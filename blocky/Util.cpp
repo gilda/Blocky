@@ -3,6 +3,7 @@
 namespace Util {
 	// initialize OpenSSL crypto library
 	void initOpenSSL() {
+		printf("initializing OpenSSL...\n");
 		srand((unsigned)time(0));
 		SSL_library_init();
 		SSL_load_error_strings();
@@ -23,6 +24,7 @@ namespace Util {
 		ERR_free_strings();
 		EVP_cleanup();
 		CRYPTO_cleanup_all_ex_data();
+		printf("cleaning up OpenSSL...\n");
 	}
 
 

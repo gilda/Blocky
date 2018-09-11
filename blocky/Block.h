@@ -4,7 +4,6 @@
 #include <vector>
 #include "Util.h"
 #include "Transaction.h"
-//#include "Blockchain.h"
 
 class Block {
 	int id;
@@ -16,7 +15,6 @@ class Block {
 	int numTrans;
 	
 public:
-	
 	Block(std::string prevHash, int id);
 	Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans);
 	Block();

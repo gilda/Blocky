@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "Node.h"
 #include "Util.h"
 #include "Transaction.h"
 #include "Block.h"
@@ -9,7 +10,7 @@
 int main() {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO Network:
+	//TODO Network: addrToString for internal not connected addreses, Kad DHT, Bootstrap, ping pong, gossip
 	//TODO CLI: 
 	//TODO Block: 
 	//TODO Blockchain: 
@@ -20,7 +21,8 @@ int main() {
 	//TODO FileManager:
 
 	Util::initOpenSSL(); // init OpenSSL
-	Blockchain gldc = Blockchain("gldc", 16, 10);
+	Network::initNet(); // init WSA
+	/*Blockchain gldc = Blockchain("gldc", 16, 10);
 	remove((gldc.getFilePath()+".utxo").c_str());
 	remove((gldc.getFilePath()+".blck").c_str());
 
@@ -39,8 +41,14 @@ int main() {
 	Block b2 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
 	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
 	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
-	gldc.addBlock(b2);
+	gldc.addBlock(b2);*/
 
+	Node a = Node(Crypto::genKey(), 4590);
+	printf("%s\n", a.toString().c_str());
+	a.acceptConnection();
+	printf("network address: %s\n", Network::addrToString(a.conn).c_str());
+
+	Network::cleanUpNet(); // CleanUp WSA
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");
 	return 0; // exit Process
