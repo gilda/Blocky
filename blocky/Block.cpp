@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Block.h"
 
 // Constructor only dependant on prevHash

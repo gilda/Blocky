@@ -1,11 +1,10 @@
-#include <stdio.h>
-#include "Node.h"
-#include "Util.h"
-#include "Transaction.h"
-#include "Block.h"
-#include "Blockchain.h"
+#include "stdafx.h"
 #include "Crypto.h"
-#include "FileManager.h"
+#include "Util.h"
+#include "Blockchain.h"
+#include "Block.h"
+#include "Transaction.h"
+#include "Node.h"
 
 int main() {
 	//TODO ordered by importance

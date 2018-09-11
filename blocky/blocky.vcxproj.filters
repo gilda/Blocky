@@ -42,6 +42,9 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h">
@@ -63,6 +66,9 @@
       <Filter>Source Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="Node.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

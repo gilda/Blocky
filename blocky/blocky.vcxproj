@@ -77,6 +77,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\OpenSSL-Win32\include</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\OpenSSL-Win32\lib</AdditionalLibraryDirectories>
@@ -102,6 +103,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -131,6 +133,10 @@
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Transaction.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
@@ -140,6 +146,7 @@
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Transaction.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
