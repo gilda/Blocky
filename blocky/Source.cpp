@@ -10,7 +10,7 @@
 int main() {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO Network: addrToString for internal not connected addreses, Kad DHT, Bootstrap, ping pong, gossip
+	//TODO Network: send & recv thread style, Kad DHT, Bootstrap, ping pong, gossip
 	//TODO CLI: 
 	//TODO Block: 
 	//TODO Blockchain: 
@@ -44,9 +44,10 @@ int main() {
 	gldc.addBlock(b2);*/
 
 	Node a = Node(Crypto::genKey(), 4590);
-	printf("%s\n", a.toString().c_str());
-	a.acceptConnection();
-	printf("network address: %s\n", Network::addrToString(a.conn).c_str());
+	printf("\n%s\n\n", a.toString().c_str());
+
+	a.connectToServer("127.0.0.1", 4591);
+	a.netSend("Hello this is the client socket", false);
 
 	Network::cleanUpNet(); // CleanUp WSA
 	Util::cleanupOpenSSL(); // CleanUp SSL
