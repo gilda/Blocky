@@ -8,13 +8,13 @@
 int main(int argc, char* argv[]) {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO CLI: get rid of all the system("pause") before release
-	//TODO Block: 
-	//TODO Blockchain: 
+	//TODO CLI: TODO get rid of all the system("pause") before release
+	//TODO Block: TODO insert metadata
+	//TODO Blockchain: TODO parseBlockchain, TODO constructor writes to block file the params
 	//TODO GUI:
 	//TODO Transaction: 
 	//TODO Crypto: 
-	//TODO Util: 
+	//TODO Util: fix help message. 
 	//TODO FileManager:
 
 	// parse command line arguments and act accordingly
@@ -27,10 +27,25 @@ int main(int argc, char* argv[]) {
 			printf("%s", Util::helpText().c_str());
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("printBlockchainParams").c_str()){
+		}else if(argv[1] == std::string("init").c_str()){ // create a new blockchain
 			// TODO
+		}else if(argv[1] == std::string("printBlockchainParams").c_str()){ // print the init params of some blockchain
+			// syntax: blocky printBlockchainParams <filePath>
+			std::string filePath = argv[2];
+
+			// TODO possibly use Blockchian.parseBlockchain(filePath);
+			int numBlocks;
+			int reward;
+			int difficulty;
+			
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("printBlock").c_str()){
-			// TODO
+			// syntax: blocky printBlock <file path> <block height>
+			std::string filePath = argv[2];
+			int blockHeight = std::stoi(argv[3]);
+			// TODO find block in block file and print the entire block with possibly metadata
+
 		}else if(argv[1] == std::string("printTransaction").c_str()){
 			// TODO
 		}else if(argv[1] == std::string("genKey").c_str()){

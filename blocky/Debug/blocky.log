@@ -1,3 +1,2 @@
-﻿  Source.cpp
-  LINK : C:\Users\gil\source\repos\blocky\Debug\blocky.exe not found or not built by the last incremental link; performing full link
-  blocky.vcxproj -> C:\Users\gil\source\repos\blocky\Debug\blocky.exe
+﻿  Util.cpp
+c:\users\gil\source\repos\blocky\blocky\util.cpp(196): error C4716: 'Util::helpText': must return a value

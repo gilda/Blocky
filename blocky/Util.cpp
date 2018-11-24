@@ -187,6 +187,11 @@ namespace Util {
 
 	// return the help text for the program
 	std::string helpText(){
-		return "Welcome to the gildots blockchain program!\nLegal commands are:\n\nhelp    display this help message\n\n";
+		std::string help =
+			"Welcome to the blocky blockchain program!\n"
+			"Usage:\n"
+			"\tblocky command --option <argument>\n"
+			"\tblocky help\tdisplay this help message"
+			"\tblocy init <name> <difficulty> <reward>";
 	}
 }
