@@ -184,4 +184,9 @@ namespace Util {
 	int random(int min, int max){
 		return rand()%max+min;
 	}
+
+	// return the help text for the program
+	std::string helpText(){
+		return "Welcome to the gildots blockchain program!\nLegal commands are:\n\nhelp    display this help message\n\n";
+	}
 }

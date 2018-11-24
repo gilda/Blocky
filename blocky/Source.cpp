@@ -4,13 +4,11 @@
 #include "Blockchain.h"
 #include "Block.h"
 #include "Transaction.h"
-#include "Node.h"
 
-int main() {
+int main(int argc, char* argv[]) {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO Network: send & recv thread style, Kad DHT, Bootstrap, ping pong, gossip
-	//TODO CLI: 
+	//TODO CLI: get rid of all the system("pause") before release
 	//TODO Block: 
 	//TODO Blockchain: 
 	//TODO GUI:
@@ -19,8 +17,38 @@ int main() {
 	//TODO Util: 
 	//TODO FileManager:
 
+	// parse command line arguments and act accordingly
+	if(argc <= 1){
+		printf("%s", Util::helpText().c_str());
+		system("pause");
+		return 0;
+	}else{
+		if(argv[1] == std::string("help").c_str()){
+			printf("%s", Util::helpText().c_str());
+			system("pause");
+			return 0;
+		}else if(argv[1] == std::string("printBlockchainParams").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("printBlock").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("printTransaction").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("genKey").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("getBalance").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("sendTransaction").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("mineBlock").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("verifyBlock").c_str()){
+			// TODO
+		}else if(argv[1] == std::string("verifyBlockchain").c_str()){
+			// TODO
+		}
+	}
+
 	Util::initOpenSSL(); // init OpenSSL
-	Network::initNet(); // init WSA
 	/*Blockchain gldc = Blockchain("gldc", 16, 10);
 	remove((gldc.getFilePath()+".utxo").c_str());
 	remove((gldc.getFilePath()+".blck").c_str());
@@ -42,13 +70,6 @@ int main() {
 	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
 	gldc.addBlock(b2);*/
 
-	Node a = Node(Crypto::genKey(), 4590);
-	printf("\n%s\n\n", a.toString().c_str());
-
-	a.connectToServer("127.0.0.1", 4591);
-	a.netSend("Hello this is the client socket", false);
-
-	Network::cleanUpNet(); // CleanUp WSA
 	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");
 	return 0; // exit Process

@@ -24,4 +24,5 @@ namespace Util{
 	std::string base58Encode(std::string hexnum);
 	std::string base58Decode(std::string str);
 	int random(int min, int max);
+	std::string helpText();
 }

@@ -39,9 +39,6 @@
     <ClCompile Include="FileManager.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -64,9 +61,6 @@
     </ClInclude>
     <ClInclude Include="FileManager.h">
       <Filter>Source Files\Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
