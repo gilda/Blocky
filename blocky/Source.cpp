@@ -42,24 +42,72 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("printBlock").c_str()){
 			// syntax: blocky printBlock <file path> <block height>
+			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
 			// TODO find block in block file and print the entire block with possibly metadata
 
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("printTransaction").c_str()){
-			// TODO
+			// syntax: blocky printTransaction <file path> <transaction hash>
+			if(argc < 4){return 1;}
+			std::string filePath = argv[2];
+			std::string hash = argv[3];
+
+			// TODO loop through all of blockchain and find the transaction
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("genKey").c_str()){
-			// TODO
+			// syntax: blocky genKey
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("getBalance").c_str()){
-			// TODO
+			// syntax: blocky getBalance <file path> <address>
+			if(argc < 3){return 1;}
+			std::string filePath = argv[2];
+			std::string address = argv[3];
+
+			// loop through all of UTXO file and accumulate balance of address
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("sendTransaction").c_str()){
-			// TODO
+			// syntax: blocky sendTransaction <file path> <private key> <public key> <amount> <address>
+			if(argc < 7){return 1;}
+			std::string filePath = argv[2];
+			std::string privKey = argv[3];
+			std::string pubKey = argv[4];
+			int amount = std::stoi(argv[5]);
+			std::string address = argv[6];
+
+			// TODO add to the transaction pool file the transaction
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("mineBlock").c_str()){
-			// TODO
+			// syntax: blocky mineBlock <file path> <tranaction hash> [<--metadata>]
+			if(argc < 3){return 1;}
+			std::string filePath = argv[2];
+			
+			// TODO loop through all argv[3++], construct block, mine it, and add it to the block file
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("verifyBlock").c_str()){
-			// TODO
+			// syntax: blocky verifyBlock <file path> <block height>
+			if(argc < 4){return 1;}
+			std::string filePath = argv[2];
+			int blockHeight = std::stoi(argv[3]);
+
+			// TODO loop through all of block file, find the block and dump it with metadata
+			system("pause");
+			return 0;
 		}else if(argv[1] == std::string("verifyBlockchain").c_str()){
-			// TODO
+			// syntax: blocky verifyBlockchain <file path>
+			if(argc < 3){return 1;}
+			std::string filePath = argv[2];
+
+			// TODO loop through entire block file and verify each block, if one is invalid, produce a message
+			system("pause");
+			return 0;
 		}
 	}
 
