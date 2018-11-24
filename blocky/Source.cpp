@@ -13,34 +13,40 @@ int main(int argc, char* argv[]) {
 	//TODO Blockchain: TODO parseBlockchain, TODO constructor writes to block file the params
 	//TODO GUI:
 	//TODO Transaction: 
-	//TODO Crypto: 
+	//TODO Crypto: TODO genPubFromPriv(), all lower case for input and output hex and trim or prepend 0x 
 	//TODO Util: fix help message. 
 	//TODO FileManager:
-
+	
 	// parse command line arguments and act accordingly
 	if(argc <= 1){
 		printf("%s", Util::helpText().c_str());
 		system("pause");
 		return 0;
 	}else{
-		if(argv[1] == std::string("help").c_str()){
+		if(argv[1] == std::string("help") || argv[1] == std::string("--help")){
+			// syntax: blocky {help, --help}
 			printf("%s", Util::helpText().c_str());
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("init").c_str()){ // create a new blockchain
-			// TODO
-		}else if(argv[1] == std::string("printBlockchainParams").c_str()){ // print the init params of some blockchain
-			// syntax: blocky printBlockchainParams <filePath>
+		}else if(argv[1] == std::string("init")){
+			// syntax: blocky init <file path> <difficulty> <reward>
+			if(argc < 5){return 1;}
 			std::string filePath = argv[2];
+			int difficulty = std::stoi(argv[3]);
+			int reward= std::stoi(argv[4]);
 
-			// TODO possibly use Blockchian.parseBlockchain(filePath);
-			int numBlocks;
-			int reward;
-			int difficulty;
-			
+			// TODO create the folder and the metadata file
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("printBlock").c_str()){
+		}else if(argv[1] == std::string("printBlockchainParams")){ // print the init params of some blockchain
+			// syntax: blocky printBlockchainParams <filePath>
+			if(argc < 3){return 1;}
+			std::string filePath = argv[2];
+
+			// TODO possibly use Blockchian.parseBlockchain(filePath);			
+			system("pause");
+			return 0;
+		}else if(argv[1] == std::string("printBlock")){
 			// syntax: blocky printBlock <file path> <block height>
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
@@ -49,7 +55,7 @@ int main(int argc, char* argv[]) {
 
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("printTransaction").c_str()){
+		}else if(argv[1] == std::string("printTransaction")){
 			// syntax: blocky printTransaction <file path> <transaction hash>
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
@@ -58,11 +64,21 @@ int main(int argc, char* argv[]) {
 			// TODO loop through all of blockchain and find the transaction
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("genKey").c_str()){
+		}else if(argv[1] == std::string("genKey")){
 			// syntax: blocky genKey
+			// TODO add parameter for deriving public from private
+			Util::initOpenSSL();
+			// create a new key pair
+			EC_KEY *newKey = Crypto::genKey();
+			
+			// prompt the user
+			printf("this is your new public key, you can send this key to others so they can send you some tokens:\n%s\n", Crypto::getPublicString(newKey).c_str());
+			printf("if you are ready, press any key to view your private key\n");
 			system("pause");
-			return 0;
-		}else if(argv[1] == std::string("getBalance").c_str()){
+			printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Crypto::getPrivateString(newKey).c_str());
+			
+			Util::cleanupOpenSSL();
+		}else if(argv[1] == std::string("getBalance")){
 			// syntax: blocky getBalance <file path> <address>
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
@@ -71,7 +87,7 @@ int main(int argc, char* argv[]) {
 			// loop through all of UTXO file and accumulate balance of address
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("sendTransaction").c_str()){
+		}else if(argv[1] == std::string("sendTransaction")){
 			// syntax: blocky sendTransaction <file path> <private key> <public key> <amount> <address>
 			if(argc < 7){return 1;}
 			std::string filePath = argv[2];
@@ -83,15 +99,16 @@ int main(int argc, char* argv[]) {
 			// TODO add to the transaction pool file the transaction
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("mineBlock").c_str()){
+		}else if(argv[1] == std::string("mineBlock")){
 			// syntax: blocky mineBlock <file path> <tranaction hash> [<--metadata>]
+			// TODO add option for just line numbers in transaction pool file
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
 			
 			// TODO loop through all argv[3++], construct block, mine it, and add it to the block file
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("verifyBlock").c_str()){
+		}else if(argv[1] == std::string("verifyBlock")){
 			// syntax: blocky verifyBlock <file path> <block height>
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
@@ -100,7 +117,7 @@ int main(int argc, char* argv[]) {
 			// TODO loop through all of block file, find the block and dump it with metadata
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("verifyBlockchain").c_str()){
+		}else if(argv[1] == std::string("verifyBlockchain")){
 			// syntax: blocky verifyBlockchain <file path>
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
@@ -111,7 +128,6 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	Util::initOpenSSL(); // init OpenSSL
 	/*Blockchain gldc = Blockchain("gldc", 16, 10);
 	remove((gldc.getFilePath()+".utxo").c_str());
 	remove((gldc.getFilePath()+".blck").c_str());
@@ -133,7 +149,6 @@ int main(int argc, char* argv[]) {
 	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
 	gldc.addBlock(b2);*/
 
-	Util::cleanupOpenSSL(); // CleanUp SSL
 	system("pause");
 	return 0; // exit Process
 }

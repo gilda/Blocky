@@ -4,7 +4,6 @@
 namespace Util {
 	// initialize OpenSSL crypto library
 	void initOpenSSL() {
-		printf("initializing OpenSSL...\n");
 		srand((unsigned)time(0));
 		SSL_library_init();
 		SSL_load_error_strings();
@@ -25,7 +24,6 @@ namespace Util {
 		ERR_free_strings();
 		EVP_cleanup();
 		CRYPTO_cleanup_all_ex_data();
-		printf("cleaning up OpenSSL...\n");
 	}
 
 
@@ -191,7 +189,17 @@ namespace Util {
 			"Welcome to the blocky blockchain program!\n"
 			"Usage:\n"
 			"\tblocky command --option <argument>\n"
-			"\tblocky help\tdisplay this help message"
-			"\tblocy init <name> <difficulty> <reward>";
+			"\tblocky help --help\tdisplay this help message\n"
+			"\tblocky init <name> <difficulty> <reward>\tcreate a new blockchain\n"
+			"\tblocky printBlockchainParams <filePath>\tdisplay the blockchain metadata given a file path\n"
+			"\tblocky printBlock <file path> <block height>\tprint a raw block from a blockchain file\n"
+			"\tblocky printTransaction <file path> <transaction hash>\tprint a transaction given a hash of it\n"
+			"\tblocky genKey\tgenerate a new keypair\n"
+			"\tblocky getBalance <file path> <address>\tdisplays the balance of a given address\n"
+			"\tblocky sendTransaction <file path> <private key> <public key> <amount> <address>\tadds a new transaction to the transaction pool\n"
+			"\tblocky mineBlock <file path> <tranaction hash> [<--metadata>]\t create mine and add a new block to the blockchain\n"
+			"\tblocky verifyBlock <file path> <block height>\treturns whether or not a block in the blockchain is valid\n"
+			"\tblocky verifyBlockchain <file path>\treturns whether or not the entire blockchain is valid\n";
+		return help;
 	}
 }

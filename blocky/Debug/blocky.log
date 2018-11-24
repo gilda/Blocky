@@ -1,2 +1,4 @@
-﻿  Util.cpp
-c:\users\gil\source\repos\blocky\blocky\util.cpp(196): error C4716: 'Util::helpText': must return a value
+﻿  Source.cpp
+  Util.cpp
+  Generating Code...
+  blocky.vcxproj -> C:\Users\gil\source\repos\blocky\Debug\blocky.exe
