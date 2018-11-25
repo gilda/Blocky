@@ -2,11 +2,17 @@
 #include "Blockchain.h"
 
 //Constructor
-Blockchain::Blockchain(std::string filePath, int difficulty, int reward) {
+Blockchain::Blockchain(std::string filePath, int difficulty, int reward, std::string name) {
 	this->filePath = filePath;
 	this->difficulty = difficulty;
 	this->numBlocks = 0;
 	this->reward = reward;
+	// check whether or not there is a blockchain metadata file
+	if(!FileManager::isFile(this->filePath+".meta")){
+		FileManager::openFile(this->filePath+".meta");
+	}
+	// write all of the metadata to the file
+	FileManager::writeLine(this->filePath+".meta", name+"{"+std::to_string(this->difficulty)+"}["+std::to_string(this->reward)+"]", 0);
 	// create genesis
 	this->blocks = std::vector<Block>(0);
 
@@ -214,4 +220,38 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 		}
 	}
 	return true;
+}
+
+Blockchain Blockchain::parseBlockchain(std::string filePath){
+	// TODO check and test
+	// check whether the files exist
+	if(!FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".meta")){return Blockchain("", 0, 0, "");}
+	
+	std::string metadata = FileManager::readLine(filePath+".meta", 0);
+	Blockchain ret = Blockchain(filePath, std::stoi(metadata.substr(metadata.find("{") + 1, metadata.find("}"))), std::stoi(metadata.substr(metadata.find("[") + 1, metadata.find("]"))), metadata.substr(0, metadata.find("{")));
+	
+	// count the blocks to add to the blockchain
+	int numBlocks = 0;
+	for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
+		if(FileManager::readLine(filePath + ".blck", i).find("}:\n") != std::string::npos){numBlocks++;}
+	}
+
+	// loop over and add all of the parsed blocks
+	for(int i = 0; i < numBlocks; i++){
+		// make sure the blockcs are valid
+		if(ret.validateBlockHashes(Block::parseBlock(filePath + ".blck", i)) != true){
+			printf("parsed blockchain is invalid");
+			return ret;	
+		}else if(ret.validateBlockTransactionSig(Block::parseBlock(filePath + ".blck", i)) != true){
+			printf("parsed blockchain is invalid");
+			return ret;
+		}
+
+		// if valid, add the block and parse the next one
+		ret.blocks.push_back(Block::parseBlock(filePath + ".blck", i));
+		ret.writeLastBlock();
+		ret.numBlocks++;
+	}
+	// return fully parsed blockchain that was loaded to memory
+	return ret;
 }

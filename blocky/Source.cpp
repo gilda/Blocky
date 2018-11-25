@@ -8,14 +8,38 @@
 int main(int argc, char* argv[]) {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO CLI: TODO get rid of all the system("pause") before release
+	//TODO CLI: TODO get rid of all the system("pause") before release, get rid of weird printf()s
 	//TODO Block: TODO insert metadata
-	//TODO Blockchain: TODO parseBlockchain, TODO constructor writes to block file the params
+	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug
 	//TODO GUI:
 	//TODO Transaction: 
-	//TODO Crypto: TODO genPubFromPriv(), all lower case for input and output hex and trim or prepend 0x 
-	//TODO Util: fix help message. 
+	//TODO Crypto: TODO genPubFromPriv()
+	//TODO Util:
 	//TODO FileManager:
+
+	/*remove(std::string("gldc.utxo").c_str());
+	remove(std::string("gldc.blck").c_str());
+	remove(std::string("gldc.meta").c_str());
+	Blockchain gldc = Blockchain("gldc", 16, 10, "gilda");
+
+	EC_KEY *key = Crypto::genKey();
+	EC_KEY *key1 = Crypto::genKey();
+
+	Block b0 = Block(Util::Hash256(gldc.getFilePath()), 0);
+	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	gldc.addBlock(b0);
+
+	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
+	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
+	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	gldc.addBlock(b1);
+
+	Block b2 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
+	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
+	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	gldc.addBlock(b2);
+
+	Blockchain parsed = Blockchain::parseBlockchain("gldc");*/
 	
 	// parse command line arguments and act accordingly
 	if(argc <= 1){
@@ -72,10 +96,10 @@ int main(int argc, char* argv[]) {
 			EC_KEY *newKey = Crypto::genKey();
 			
 			// prompt the user
-			printf("this is your new public key, you can send this key to others so they can send you some tokens:\n%s\n", Crypto::getPublicString(newKey).c_str());
+			printf("this is your new public key, you can send this key to others so they can send you some tokens:\n%s\n", Util::base58Encode(Crypto::getPublicString(newKey)).c_str());
 			printf("if you are ready, press any key to view your private key\n");
 			system("pause");
-			printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Crypto::getPrivateString(newKey).c_str());
+			printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
 			
 			Util::cleanupOpenSSL();
 		}else if(argv[1] == std::string("getBalance")){
@@ -127,27 +151,6 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}
 	}
-
-	/*Blockchain gldc = Blockchain("gldc", 16, 10);
-	remove((gldc.getFilePath()+".utxo").c_str());
-	remove((gldc.getFilePath()+".blck").c_str());
-
-	EC_KEY *key = Crypto::genKey();
-	EC_KEY *key1 = Crypto::genKey();
-	
-	Block b0 = Block(Util::Hash256(gldc.getFilePath()), 0);
-	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
-	gldc.addBlock(b0);
-
-	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
-	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
-	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
-	gldc.addBlock(b1);
-
-	Block b2 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
-	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
-	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
-	gldc.addBlock(b2);*/
 
 	system("pause");
 	return 0; // exit Process

@@ -12,7 +12,7 @@ class Blockchain {
 
 public:
 
-	Blockchain(std::string filePath, int difficulty, int reward);
+	Blockchain(std::string filePath, int difficulty, int reward, std::string name);
 	Block *getGenesis();
 	Block *getLastBlock();
 	Block *getBlock(int index);
@@ -26,4 +26,5 @@ public:
 	bool validateBlockHashes(Block vBlock);
 	bool validateBlockTransactionSig(Block vBlock);
 	bool validateLastBlockUTXO(Block vBlock);
+	static Blockchain parseBlockchain(std::string filePath);
 };
