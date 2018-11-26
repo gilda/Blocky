@@ -1,2 +1,10 @@
-﻿  Source.cpp
-  blocky.vcxproj -> C:\Users\gil\source\repos\blocky\Debug\blocky.exe
+﻿  stdafx.cpp
+  Util.cpp
+  Transaction.cpp
+  Source.cpp
+  FileManager.cpp
+  Crypto.cpp
+  Blockchain.cpp
+  Block.cpp
+  Generating Code...
+  blocky.vcxproj -> C:\Users\Ronni\source\repos\Blocky\Debug\blocky.exe

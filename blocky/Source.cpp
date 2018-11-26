@@ -49,26 +49,42 @@ int main(int argc, char* argv[]) {
 	}else{
 		if(argv[1] == std::string("help") || argv[1] == std::string("--help")){
 			// syntax: blocky {help, --help}
+			// print the help texg
 			printf("%s", Util::helpText().c_str());
 			system("pause");
 			return 0;
+		
 		}else if(argv[1] == std::string("init")){
-			// syntax: blocky init <file path> <difficulty> <reward>
-			if(argc < 5){return 1;}
+			// syntax: blocky init <file path> <difficulty> <reward> <name>
+			// parse the command line argumenst
+			if(argc < 6){return 1;}
 			std::string filePath = argv[2];
 			int difficulty = std::stoi(argv[3]);
 			int reward= std::stoi(argv[4]);
-
-			// TODO create the folder and the metadata file
-			system("pause");
+			std::string name = argv[5];
+			
+			// create the new blockchain
+			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, name);
+			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d", name, filePath, difficulty, reward);
+			
 			return 0;
 		}else if(argv[1] == std::string("printBlockchainParams")){ // print the init params of some blockchain
 			// syntax: blocky printBlockchainParams <filePath>
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
+			// check that the metadata file exists
+			if(!FileManager::isFile(filePath + ".meta")){return 1;}
 
-			// TODO possibly use Blockchian.parseBlockchain(filePath);			
-			system("pause");
+			// parse the metadata file and print it's contents
+			std::string line = FileManager::readLine(filePath + ".meta", 0);
+			std::string name = line.substr(0, line.find("{"));
+			int diffculty = std::stoi(line.substr(line.find("{") + 1, line.find("[")));
+			int reward = std::stoi(line.substr(line.find("[") + 1, line.find("]")));
+			// TODO possibly use Blockchian.parseBlockchain(filePath);
+
+			// output the relevant data
+			printf("this is the blockchain file path for a blockchain named %s with mining diffculty of %d and block reward of %d", name, diffculty, reward);
+			
 			return 0;
 		}else if(argv[1] == std::string("printBlock")){
 			// syntax: blocky printBlock <file path> <block height>
@@ -102,6 +118,7 @@ int main(int argc, char* argv[]) {
 			printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
 			
 			Util::cleanupOpenSSL();
+			return 0;
 		}else if(argv[1] == std::string("getBalance")){
 			// syntax: blocky getBalance <file path> <address>
 			if(argc < 3){return 1;}
