@@ -7,7 +7,6 @@
 
 int main(int argc, char* argv[]) {
 	//TODO ordered by importance
-	//TODO COMMENT LAST COMMIT!
 	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages
 	//TODO Block: TODO insert metadata
 	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug
@@ -87,6 +86,7 @@ int main(int argc, char* argv[]) {
 			
 			return 0;
 		}else if(argv[1] == std::string("printBlock")){
+			// TODO add option for metadata printage
 			// syntax: blocky printBlock <file path> <block height>
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
@@ -95,8 +95,11 @@ int main(int argc, char* argv[]) {
 			// check if file does not exist
 			if(!FileManager::isFile(filePath + ".blck")){return 1;}
 
+			// make sure block exists in the file
+			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){return 1;}
+			
 			// find block in block file and print the entire block with metadata
-			printf("%s", Block::parseBlock(filePath + ".blck", blockHeight));
+			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight));
 
 			return 0;
 		}else if(argv[1] == std::string("printTransaction")){
@@ -104,10 +107,29 @@ int main(int argc, char* argv[]) {
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
 			std::string hash = argv[3];
+			
+			// check if file does not exist
+			if(!FileManager::isFile(filePath + ".blck")){return 1;}
 
-			// TODO loop through all of blockchain and find the transaction
-			system("pause");
-			return 0;
+			// find the max block
+			int maxBlock = 0;
+			while(!Block::parseBlock(filePath + ".blck", maxBlock).empty()){
+				maxBlock++;
+			}
+			
+			// loop over all transaction in blockchain until the one with the same hash is found
+			for(int i = 0; i < maxBlock; i++){
+				Block blockToCheck = Block::parseBlock(filePath + ".blck", i);
+				for(std::vector<Transaction>::iterator it = blockToCheck.getTransactionVec().begin(); it != blockToCheck.getTransactionVec().end(); it++){
+					// check whether the hash of the transaction found is the same as the one given
+					if(it->getHash() == hash){
+						printf("%s\n", it->toString());
+						return 0;
+					}
+				}
+			}
+
+			return 1;
 		}else if(argv[1] == std::string("genKey")){
 			// syntax: blocky genKey
 			// TODO add parameter for deriving public from private
