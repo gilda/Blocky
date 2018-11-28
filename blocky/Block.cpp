@@ -15,13 +15,14 @@ Block::Block(std::string prevHash, int id) {
 }
 
 // parser constructor
-Block::Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans){
+Block::Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans, std::string metadata = ""){
 	this->id = id;
 	this->prevHash = prevHash;
 	this->nonce = nonce;
 	this->currHash = currHash;
 	this->transactions = transactions;
 	this->numTrans = numTrans;
+	this->metadata = metadata;
 }
 
 // default constructor
@@ -117,7 +118,7 @@ std::string Block::toString() {
 	return rets;
 }
 
-bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward) {
+bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward, std::string metadata = "") {
 	// add coinbase
 	std::vector<Transaction> inputMine;
 	Transaction coinbase = Transaction(minerPubKey, reward, minerPubKey);
@@ -212,8 +213,9 @@ Block Block::parseBlock(std::string file, int id){
 	std::string prevHash = str.substr(str.find("#")+1, str.find("|")-str.find("#")-1);
 	long long int nonce = std::stoi(str.substr(str.find("^")+1, str.find("N")-str.find("^")-1));
 	std::string currHash = str.substr(str.find("|")+1, str.find("^")-str.find("|")-1);
+	std::string metadata = str.substr(str.find("T:") + 1, str.find("\n"));
 
-	Block ret = Block(idParse, prevHash, nonce, currHash, empty, 0);
+	Block ret = Block(idParse, prevHash, nonce, currHash, empty, numTrans, metadata);
 
 	// add all transactions to the block
 	for(int i = 0; i < numTrans; i++){
@@ -249,4 +251,9 @@ std::vector<Transaction> Block::getTransInputForValue(std::string file, std::str
 		return ret;
 	}
 	return ret;
+}
+
+// return the metadata of the block
+std::string Block::getMetadata(){
+	return this->metadata;
 }

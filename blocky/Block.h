@@ -13,17 +13,18 @@ class Block {
 	std::string currHash;
 	std::vector<Transaction> transactions;
 	int numTrans;
-	
+	std::string metadata;
+
 public:
 	Block(std::string prevHash, int id);
-	Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans);
+	Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans, std::string metadata = "");
 	Block();
 	void addTransaction(std::string file, std::string prikey, std::string donor, int amount, std::string recepient);
 	std::string hashBlock();
 	std::string stringify();
 	std::string stringifyBLCK();
 	std::string toString();
-	bool mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward);
+	bool mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward, std::string metadata = "");
 	Transaction *getLastTransaction();
 	Transaction *getTransaction(int index);
 	std::vector<Transaction> getTransactionVec();
@@ -35,4 +36,5 @@ public:
 	static Block parseBlock(std::string file, int id);
 	bool empty();
 	std::vector<Transaction> getTransInputForValue(std::string file, std::string pubKey, int amount);
+	std::string getMetadata();
 };

@@ -9,10 +9,11 @@ class Blockchain {
 	std::vector<Block> blocks;
 	int difficulty;
 	int reward;
+	int maxMetadataChar;
 
 public:
 
-	Blockchain(std::string filePath, int difficulty, int reward, std::string name);
+	Blockchain(std::string filePath, int difficulty, int reward, int maxMetadataChar, std::string name);
 	Block *getGenesis();
 	Block *getLastBlock();
 	Block *getBlock(int index);

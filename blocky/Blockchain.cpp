@@ -2,18 +2,22 @@
 #include "Blockchain.h"
 
 //Constructor
-Blockchain::Blockchain(std::string filePath, int difficulty, int reward, std::string name) {
+Blockchain::Blockchain(std::string filePath, int difficulty, int reward, int maxMetadataChar, std::string name) {
 	this->filePath = filePath;
 	this->difficulty = difficulty;
 	this->numBlocks = 0;
 	this->reward = reward;
+	this->maxMetadataChar = maxMetadataChar;
+
 	// check whether or not there is a blockchain metadata file
 	if(!FileManager::isFile(this->filePath+".meta")){
 		FileManager::openFile(this->filePath+".meta");
 	}
+
 	// write all of the metadata to the file
-	FileManager::writeLine(this->filePath+".meta", name+"{"+std::to_string(this->difficulty)+"}["+std::to_string(this->reward)+"]", 0);
-	// create genesis
+	FileManager::writeLine(this->filePath+".meta", name+"{"+std::to_string(this->difficulty)+"}["+std::to_string(this->reward)+"]<" + std::to_string(this->maxMetadataChar) + ">", 0);
+	
+	// create genesis block
 	this->blocks = std::vector<Block>(0);
 
 }
@@ -59,6 +63,8 @@ void Blockchain::addBlock(Block blockToAdd) {
 		return;
 	}else if(this->validateLastBlockUTXO(blockToAdd) != true){
 		printf("last block utxo wrong!\n");
+		return;
+	}else if(this->maxMetadataChar < blockToAdd.getMetadata().length()){
 		return;
 	}
 	
@@ -225,10 +231,10 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 Blockchain Blockchain::parseBlockchain(std::string filePath){
 	// TODO check and test
 	// check whether the files exist
-	if(!FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".meta")){return Blockchain("", 0, 0, "");}
+	if(!FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".meta")){return Blockchain("", 0, 0, 0,"");}
 	
 	std::string metadata = FileManager::readLine(filePath+".meta", 0);
-	Blockchain ret = Blockchain(filePath, std::stoi(metadata.substr(metadata.find("{") + 1, metadata.find("}"))), std::stoi(metadata.substr(metadata.find("[") + 1, metadata.find("]"))), metadata.substr(0, metadata.find("{")));
+	Blockchain ret = Blockchain(filePath, std::stoi(metadata.substr(metadata.find("{") + 1, metadata.find("}"))), std::stoi(metadata.substr(metadata.find("[") + 1, metadata.find("]"))), std::stoi(metadata.substr(metadata.find("<") + 1, metadata.find(">"))), metadata.substr(0, metadata.find("{")));
 	
 	// count the blocks to add to the blockchain
 	int numBlocks = 0;

@@ -8,11 +8,11 @@
 int main(int argc, char* argv[]) {
 	//TODO ordered by importance
 	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages
-	//TODO Block: TODO insert metadata
-	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug
+	//TODO Block: TODO insert metadata parse
+	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug, TODO maxMetadataChar check when adding block
+	//TODO Crypto: TODO genPubFromPriv()
 	//TODO GUI:
 	//TODO Transaction: 
-	//TODO Crypto: TODO genPubFromPriv()
 	//TODO Util:
 	//TODO FileManager:
 
@@ -54,16 +54,17 @@ int main(int argc, char* argv[]) {
 			return 0;
 		
 		}else if(argv[1] == std::string("init")){
-			// syntax: blocky init <file path> <difficulty> <reward> <name>
+			// syntax: blocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>
 			// parse the command line argumenst
-			if(argc < 6){return 1;}
+			if(argc < 7){return 1;}
 			std::string filePath = argv[2];
 			int difficulty = std::stoi(argv[3]);
-			int reward= std::stoi(argv[4]);
-			std::string name = argv[5];
+			int reward = std::stoi(argv[4]);
+			int maxMetadataChar = std::stoi(argv[5]);
+			std::string name = argv[6];
 			
 			// create the new blockchain
-			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, name);
+			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, maxMetadataChar,name);
 			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d", name, filePath, difficulty, reward);
 			
 			return 0;

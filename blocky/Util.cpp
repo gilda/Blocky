@@ -190,7 +190,7 @@ namespace Util {
 			"Usage:\n"
 			"\tblocky command --option <argument>\n"
 			"\tblocky help --help\tdisplay this help message\n"
-			"\tblocky init <name> <difficulty> <reward> <name>\tcreate a new blockchain\n"
+			"\tblocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>\tcreate a new blockchain\n"
 			"\tblocky printBlockchainParams <filePath>\tdisplay the blockchain metadata given a file path\n"
 			"\tblocky printBlock <file path> <block height>\tprint a raw block from a blockchain file\n"
 			"\tblocky printTransaction <file path> <transaction hash>\tprint a transaction given a hash of it\n"
