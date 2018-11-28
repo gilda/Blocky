@@ -8,7 +8,7 @@
 int main(int argc, char* argv[]) {
 	//TODO ordered by importance
 	//TODO COMMENT LAST COMMIT!
-	//TODO CLI: TODO get rid of all the system("pause") before release, get rid of weird printf()s
+	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages
 	//TODO Block: TODO insert metadata
 	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug
 	//TODO GUI:
@@ -91,9 +91,13 @@ int main(int argc, char* argv[]) {
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
-			// TODO find block in block file and print the entire block with possibly metadata
 
-			system("pause");
+			// check if file does not exist
+			if(!FileManager::isFile(filePath + ".blck")){return 1;}
+
+			// find block in block file and print the entire block with metadata
+			printf("%s", Block::parseBlock(filePath + ".blck", blockHeight));
+
 			return 0;
 		}else if(argv[1] == std::string("printTransaction")){
 			// syntax: blocky printTransaction <file path> <transaction hash>
