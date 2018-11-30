@@ -15,7 +15,7 @@ Block::Block(std::string prevHash, int id) {
 }
 
 // parser constructor
-Block::Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans, std::string metadata = ""){
+Block::Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans, std::string metadata){
 	this->id = id;
 	this->prevHash = prevHash;
 	this->nonce = nonce;
@@ -68,7 +68,8 @@ std::string Block::stringify(){
 		std::to_string(this->id) + "#" +
 		this->prevHash + "|" +
 		std::to_string(this->nonce) + "N" +
-		std::to_string(this->numTrans) + "T:\n";
+		std::to_string(this->numTrans) + "T:" + 
+		this->metadata +"\n";
 	// loop over all transactions
 	std::vector<Transaction> trans = this->transactions;
 	for (std::vector<Transaction>::iterator it = trans.begin(); it != trans.end(); it++) {
@@ -84,7 +85,8 @@ std::string Block::stringifyBLCK(){
 		this->prevHash+"|"+
 		this->currHash+"^"+
 		std::to_string(this->nonce)+"N"+
-		std::to_string(this->numTrans)+"T:\n";
+		std::to_string(this->numTrans)+"T:" + 
+		this->metadata + "\n";
 	// loop over all transactions
 	std::vector<Transaction> trans = this->transactions;
 	for(std::vector<Transaction>::iterator it = trans.begin(); it!=trans.end(); it++){
@@ -107,7 +109,8 @@ std::string Block::toString() {
 		"nonce: " + std::to_string(this->nonce) + "\r\n" +
 		"mined: " + (this->mined ? "true" : "false") + "\r\n" +
 		"currHash: " + this->currHash + "\r\n" +
-		"numTrans: " + std::to_string(this->numTrans) + "\r\n\r\n";
+		"numTrans: " + std::to_string(this->numTrans) + 
+		"metadata" this->metadata + "\r\n\r\n";
 	// loop over all transactions
 	int index = 0;
 	std::vector<Transaction> trans = this->transactions;
@@ -118,7 +121,7 @@ std::string Block::toString() {
 	return rets;
 }
 
-bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward, std::string metadata = "") {
+bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward, std::string metadata) {
 	// add coinbase
 	std::vector<Transaction> inputMine;
 	Transaction coinbase = Transaction(minerPubKey, reward, minerPubKey);
@@ -127,6 +130,7 @@ bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubK
 	this->transactions.push_back(coinbase);
 	this->numTrans++;
 
+	this->metadata = metadata;
 	puts("starting to mine...");
 	printf("%s", ("raw data:\r\n" + this->stringify() + "\r\n").c_str());
 	// start clock
@@ -193,6 +197,8 @@ int Block::verifyTransaction(Transaction trans, std::string sig, std::string pub
 
 // parse a block from the BLCK
 Block Block::parseBlock(std::string file, int id){
+	// make sure the file exists
+	if(!FileManager::isFile(file)){return Block::Block();}
 	// find correct starting line of block
 	int line = 0;
 	// read the line
@@ -204,22 +210,23 @@ Block Block::parseBlock(std::string file, int id){
 		line++;
 	}
 
-	str = FileManager::readLine(file , line==0 ? 0 : line-1);
+	str = FileManager::readLine(file, line == 0 ? 0 : line-1);
 	std::vector<Transaction> empty(0);
 
 	// parse all parameters using delimeters in BLCK file
-	int numTrans = std::stoi(str.substr(str.find("N")+1, str.find("T")-str.find("N")-1));
+	int numTrans = std::stoi(str.substr(str.find("N") + 1, str.find("T") - str.find("N") - 1));
 	int idParse = std::stoi(str.substr(0, str.find("#")));
-	std::string prevHash = str.substr(str.find("#")+1, str.find("|")-str.find("#")-1);
-	long long int nonce = std::stoi(str.substr(str.find("^")+1, str.find("N")-str.find("^")-1));
-	std::string currHash = str.substr(str.find("|")+1, str.find("^")-str.find("|")-1);
-	std::string metadata = str.substr(str.find("T:") + 1, str.find("\n"));
+	std::string prevHash = str.substr(str.find("#") + 1, str.find("|")-str.find("#")-1);
+	long long int nonce = std::stoi(str.substr(str.find("^") + 1, str.find("N") - str.find("^") - 1));
+	std::string currHash = str.substr(str.find("|") + 1, str.find("^")-str.find("|") - 1);
+	std::string metadata = str.substr(str.find("T:") + 2, str.find("\n") - str.find("T:") - 2);
 
 	Block ret = Block(idParse, prevHash, nonce, currHash, empty, numTrans, metadata);
 
 	// add all transactions to the block
 	for(int i = 0; i < numTrans; i++){
-		ret.getTransactionVec().push_back(Transaction::parseTransaction(file, line+i));
+		Transaction t = Transaction::parseTransaction(file, line + i + 1);
+		ret.transactions.push_back(t);
 	}
 
 	return ret;

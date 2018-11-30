@@ -9,7 +9,7 @@ class Blockchain {
 	std::vector<Block> blocks;
 	int difficulty;
 	int reward;
-	int maxMetadataChar;
+	unsigned int maxMetadataChar;
 
 public:
 

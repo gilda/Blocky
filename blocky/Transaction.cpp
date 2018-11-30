@@ -53,7 +53,7 @@ Transaction::Transaction() {
 
 // stringify for hashing and file writing
 std::string Transaction::stringify() {
-	std::string ret;
+	std::string ret = "";
 	for(std::vector<Transaction>::iterator it = this->input.begin(); it!=input.end(); it++){
 		ret+=it->getHash() + ",";
 	}

@@ -11,12 +11,12 @@ class Block {
 	long long int nonce;
 	bool mined;
 	std::string currHash;
-	std::vector<Transaction> transactions;
 	int numTrans;
 	std::string metadata;
 
 public:
 	Block(std::string prevHash, int id);
+	std::vector<Transaction> transactions;
 	Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans, std::string metadata = "");
 	Block();
 	void addTransaction(std::string file, std::string prikey, std::string donor, int amount, std::string recepient);

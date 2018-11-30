@@ -8,7 +8,7 @@
 int main(int argc, char* argv[]) {
 	//TODO ordered by importance
 	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages
-	//TODO Block: TODO insert metadata parse
+	//TODO Block: 
 	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug, TODO maxMetadataChar check when adding block
 	//TODO Crypto: TODO genPubFromPriv()
 	//TODO GUI:
@@ -16,18 +16,21 @@ int main(int argc, char* argv[]) {
 	//TODO Util:
 	//TODO FileManager:
 
-	/*remove(std::string("gldc.utxo").c_str());
+	remove(std::string("gldc.utxo").c_str());
 	remove(std::string("gldc.blck").c_str());
 	remove(std::string("gldc.meta").c_str());
-	Blockchain gldc = Blockchain("gldc", 16, 10, "gilda");
+	Blockchain gldc = Blockchain("gldc", 16, 10, 40, "gilda");
 
 	EC_KEY *key = Crypto::genKey();
 	EC_KEY *key1 = Crypto::genKey();
 
 	Block b0 = Block(Util::Hash256(gldc.getFilePath()), 0);
-	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
+	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward(), "Gilda mined this block!");
 	gldc.addBlock(b0);
-
+	
+	Block b1 = Block::parseBlock(gldc.getFilePath() + ".blck", 0);
+	printf("%s\n", b1.stringifyBLCK().c_str());
+	/*
 	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
 	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
 	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
@@ -65,7 +68,7 @@ int main(int argc, char* argv[]) {
 			
 			// create the new blockchain
 			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, maxMetadataChar,name);
-			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d", name, filePath, difficulty, reward);
+			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d", name.c_str(), filePath.c_str(), difficulty, reward);
 			
 			return 0;
 		}else if(argv[1] == std::string("printBlockchainParams")){ // print the init params of some blockchain
@@ -83,7 +86,7 @@ int main(int argc, char* argv[]) {
 			// TODO possibly use Blockchian.parseBlockchain(filePath);
 
 			// output the relevant data
-			printf("this is the blockchain file path for a blockchain named %s with mining diffculty of %d and block reward of %d", name, diffculty, reward);
+			printf("this is the blockchain file path for a blockchain named %s with mining diffculty of %d and block reward of %d", name.c_str(), diffculty, reward);
 			
 			return 0;
 		}else if(argv[1] == std::string("printBlock")){
@@ -100,7 +103,7 @@ int main(int argc, char* argv[]) {
 			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){return 1;}
 			
 			// find block in block file and print the entire block with metadata
-			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight));
+			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight).toString().c_str());
 
 			return 0;
 		}else if(argv[1] == std::string("printTransaction")){
@@ -124,7 +127,7 @@ int main(int argc, char* argv[]) {
 				for(std::vector<Transaction>::iterator it = blockToCheck.getTransactionVec().begin(); it != blockToCheck.getTransactionVec().end(); it++){
 					// check whether the hash of the transaction found is the same as the one given
 					if(it->getHash() == hash){
-						printf("%s\n", it->toString());
+						printf("%s\n", it->toString().c_str());
 						return 0;
 					}
 				}
