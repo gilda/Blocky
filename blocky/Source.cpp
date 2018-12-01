@@ -203,6 +203,7 @@ int main(int argc, char* argv[]) {
 				// a prevoius block exists, find it
 				Block prev = Block::parseBlock(filePath + ".blck", numBlocks - 1);
 				Block b = Block(prev.getCurrHash(), prev.getId() + 1);
+				printf("numBlocks: %d\n", numBlocks);
 				
 				// mine the block and add it to the blockchain
 				b.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);

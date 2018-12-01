@@ -248,7 +248,8 @@ Blockchain Blockchain::parseBlockchain(std::string filePath){
 	// count the blocks to add to the blockchain
 	int numBlocks = 0;
 	for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
-		if(FileManager::readLine(filePath + ".blck", i).find("#") != -1) numBlocks++;
+		std::string str = FileManager::readLine(filePath + ".blck", i);
+		if(str.find("#") != -1) numBlocks++;
 	}
 
 	// loop over and add all of the parsed blocks

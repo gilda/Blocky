@@ -217,6 +217,7 @@ Block Block::parseBlock(std::string file, int id){
 	str = FileManager::readLine(file, line == 0 ? 0 : line-1);
 	std::vector<Transaction> empty(0);
 
+
 	// parse all parameters using delimeters in BLCK file
 	int numTrans = std::stoi(str.substr(str.find("N") + 1, str.find("T") - str.find("N") - 1));
 	int idParse = std::stoi(str.substr(0, str.find("#")));
@@ -229,7 +230,7 @@ Block Block::parseBlock(std::string file, int id){
 
 	// add all transactions to the block
 	for(int i = 0; i < numTrans; i++){
-		Transaction t = Transaction::parseTransaction(file, line + i + 1);
+		Transaction t = Transaction::parseTransaction(file, line + i);
 		ret.transactions.push_back(t);
 	}
 
