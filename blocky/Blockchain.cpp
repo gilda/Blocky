@@ -169,25 +169,30 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 	std::vector<Transaction> trans = vBlock.getTransactionVec();
 	// each transactiom
 	for(std::vector<Transaction>::iterator it = trans.begin(); it!=trans.end(); it++){
-		if(it->getDonor()!=it->getRecipient()){
+		// payment transaction
+		if(it->getDonor() != it->getRecipient()){
 			std::vector<Transaction> input = it->getInput();
 			int paid = 0;
+			// find all of the inputs for the given transaction
 			for(std::vector<Transaction>::iterator inputTrans = input.begin(); inputTrans!=input.end(); inputTrans++){
-				for(int i = 0; i<FileManager::getLastLineNum(this->getFilePath()+".utxo"); i++){
-					Transaction transaction = Transaction::parseTransaction(this->getFilePath()+".utxo", i);
+				for(int i = 0; i < FileManager::getLastLineNum(this->getFilePath() + ".utxo"); i++){
+					Transaction transaction = Transaction::parseTransaction(this->getFilePath() + ".utxo", i);
+					// make sure the hash is the same and add the value to the paid
 					if(transaction.getHash() == inputTrans->getHash()){
-						paid += inputTrans->getAmount();
+						paid += transaction.getAmount();
 					}
 				}
 			}
+			printf("paid: %d\n", paid);
+			// after finding all inputs, make sure paid is larger than the sum
 			if(paid < it->getAmount()){
 				return false;
 			}
 		}else{
 			// check if coinbase or change
 			std::vector<Transaction> input = it->getInput();
-			if(input.size()==1 && input.at(0).getHash()==it->getHash() && it->getAmount()==this->reward){
-				// coinbase
+			if(input.size() == 1 && input.at(0).getHash() == it->getHash() && it->getAmount() == this->reward){
+				// coinbase has only one input and the reward is the same as the blockchain reward
 				continue;
 			}else{
 				// change loop over all transactions and find twin
@@ -292,5 +297,5 @@ void Blockchain::addToTransactionPool(std::string filePath, std::string privKey,
 
 	// add to the transaction pool the new transaction
 	FileManager::writeLine(filePath + ".txpl", t.stringify(), FileManager::getLastLineNum(filePath + ".txpl"));
-	printf("added transaction %s to the transaction pool successfully!\n", t.getHash());
+	printf("added transaction %s to the transaction pool successfully!\n", t.getHash().c_str());
 }

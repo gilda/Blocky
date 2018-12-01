@@ -69,13 +69,16 @@ std::string Transaction::stringify() {
 
 // toString prints all info for debugging or viewing
 std::string Transaction::toString() {
-	std::string ret="INP\n";
+	std::string ret="INP: ";
 	for(std::vector<Transaction>::iterator it = this->input.begin(); it!=input.end(); it++){
-		ret += it->getHash()+",\n";
+		ret += "0x" + it->getHash() + ",";
 	}
+	// remove last comma
+	ret.erase(ret.end() - 1);
+	ret += "\n";
 
 	ret+= 
-		"HASH: " + this->hash + "\n" +
+		"hash: 0x" + this->hash + "\n" +
 		"donor: " + this->donor + "\n"+ 
 		"amount: " + std::to_string(this->amount) + "\n" +
 		"recepient: " + this->recipient + "\n" +

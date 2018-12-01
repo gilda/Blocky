@@ -50,9 +50,8 @@ int main(int argc, char* argv[]) {
 	}else{
 		if(argv[1] == std::string("help") || argv[1] == std::string("--help")){
 			// syntax: blocky {help, --help}
-			// print the help texg
+			// print the help text
 			printf("%s", Util::helpText().c_str());
-			system("pause");
 			return 0;
 		
 		}else if(argv[1] == std::string("init")){
@@ -170,7 +169,7 @@ int main(int argc, char* argv[]) {
 			Blockchain::addToTransactionPool(filePath, privKey, pubKey, amount, address);
 			return 0;
 		}else if(argv[1] == std::string("mineBlock")){
-			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>.. [<--metadata>]
+			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]
 			// TODO add option for just line numbers in transaction pool file
 			if(argc < 5){ // not enough parameters
 				return 1;
@@ -232,8 +231,8 @@ int main(int argc, char* argv[]) {
 
 				// add all of the tx hash to a vector
 				for(int i = 5; i < argc; i++){
-					transactions.push_back(argv[i]);
-					printf("added tx %s\n", argv[i]);
+					transactions.push_back(argv[i]);					
+					printf("added transaction 0x%s to the block\n", argv[i]);
 				}
 				
 				// loop over all hashes and add them from tx pool
@@ -248,9 +247,6 @@ int main(int argc, char* argv[]) {
 				Blockchain::parseBlockchain(filePath).addBlock(b);
 				return 0;
 			}
-
-			system("pause");
-			return 0;
 		}else if(argv[1] == std::string("verifyBlock")){
 			// syntax: blocky verifyBlock <file path> <block height>
 			if(argc < 4){return 1;}
@@ -262,6 +258,14 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("verifyBlockchain")){
 			// syntax: blocky verifyBlockchain <file path>
+			if(argc < 3){return 1;}
+			std::string filePath = argv[2];
+
+			// TODO loop through entire block file and verify each block, if one is invalid, produce a message
+			system("pause");
+			return 0;
+		}else if(argv[1] == std::string("verifyTransaction")){
+			// syntax: blocky verifyTransaction <file path> <transaction hash>
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
 

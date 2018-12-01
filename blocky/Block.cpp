@@ -51,9 +51,9 @@ void Block::addTransaction(std::string file, std::string prikey, std::string don
 		this->transactions.push_back(transToAdd);
 		this->numTrans++; // increment the number of transactions
 
-		if(paid-amount!=0){
+		if(paid - amount != 0){
 			// create and add the change transaction
-			Transaction change = Transaction(input, "", donor, paid-amount, donor, "");
+			Transaction change = Transaction(input, "", donor, paid - amount, donor, "");
 			change.sign(prikey);
 			this->transactions.push_back(change);
 			this->numTrans++; // increment the number of transactions
@@ -112,18 +112,17 @@ std::string Block::hashBlock() {
 // returns string with all parameters for debugging and viewing
 std::string Block::toString() {
 	std::string rets =
-		"id: " + std::to_string(this->id) + "\r\n" +
-		"prevHash: " + this->prevHash + "\r\n" +
+		"block id: " + std::to_string(this->id) + "\r\n" +
+		"prevHash: 0x" + this->prevHash + "\r\n" +
 		"nonce: " + std::to_string(this->nonce) + "\r\n" +
-		"mined: " + (this->mined ? "true" : "false") + "\r\n" +
-		"currHash: " + this->currHash + "\r\n" +
-		"numTrans: " + std::to_string(this->numTrans) + 
-		"metadata" + this->metadata + "\r\n\r\n";
+		"currHash: 0x" + this->currHash + "\r\n" +
+		"numTrans: " + std::to_string(this->numTrans) + "\n"
+		"metadata:" + this->metadata + "\r\n\r\n";
 	// loop over all transactions
 	int index = 0;
 	std::vector<Transaction> trans = this->transactions;
 	for(std::vector<Transaction>::iterator it = trans.begin(); it != trans.end(); it++){
-		rets += std::to_string(index)+": "+it->toString() +"\r\n";
+		rets += "Transaction #" + std::to_string(index)+":\n"+it->toString() +"\r\n";
 		index++;
 	}
 	return rets;
