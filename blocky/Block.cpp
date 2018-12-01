@@ -210,11 +210,10 @@ Block Block::parseBlock(std::string file, int id){
 	while(idString != std::to_string(id)){
 		str = FileManager::readLine(file, line);
 		idString = str.substr(0, str.find("#"));
-		line++;
+		if(idString != std::to_string(id)) line++;
 	}
 
-	str = FileManager::readLine(file, line == 0 ? 0 : line-1);
-
+	str = FileManager::readLine(file, line);
 	// parse all parameters using delimeters in BLCK file
 	int idParse = std::stoi(str.substr(0, str.find("#")));
 	std::string prevHash = str.substr(str.find("#") + 1, str.find("|")-str.find("#")-1);
@@ -225,10 +224,9 @@ Block Block::parseBlock(std::string file, int id){
 	std::string metadata = str.substr(str.find("T") + 2, str.find("\n") - str.find("T") - 2);
 
 	Block ret = Block(idParse, prevHash, nonce, currHash, empty, numTrans, metadata);
-
 	// add all transactions to the block
 	for(int i = 0; i < numTrans; i++){
-		Transaction t = Transaction::parseTransaction(file, line + i);
+		Transaction t = Transaction::parseTransaction(file, line + i + 1);
 		ret.transactions.push_back(t);
 	}
 	return ret;

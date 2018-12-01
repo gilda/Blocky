@@ -129,7 +129,6 @@ Transaction Blockchain::getTransactionByHashUTXO(std::string hash){
 // validate that all the hashes in the block are valid and correct
 bool Blockchain::validateBlockHashes(Block vBlock){
 	// hash is not correct
-	printf("%s =? %s\n", vBlock.getCurrHash().c_str(), Util::Hash256(vBlock.stringify()).c_str());
 	if(vBlock.getCurrHash() != Util::Hash256(vBlock.stringify())){
 		printf("current hash is incorrect\n");
 		return false;
@@ -256,7 +255,6 @@ Blockchain Blockchain::parseBlockchain(std::string filePath){
 	// loop over and add all of the parsed blocks
 	for(int i = 0; i < numBlocks; i++){
 		// make sure the blockcs are valid
-		printf("the block:\n%s\n", Block::parseBlock(filePath + ".blck", i).stringify().c_str());
 		if(!ret.validateBlockHashes(Block::parseBlock(filePath + ".blck", i))){
 			printf("parsed blockchain is invalid (hash error)\n");
 			return ret;	
