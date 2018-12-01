@@ -6,7 +6,7 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages
+	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs
 	//TODO Block: 
 	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug, TODO maxMetadataChar check when adding block
 	//TODO Crypto: TODO genPubFromPriv()
@@ -166,9 +166,8 @@ int main(int argc, char* argv[]) {
 			int amount = std::stoi(argv[5]);
 			std::string address = argv[6];
 
-			Transaction::addToTransactionPool(filePath, privKey, pubKey, amount, address);
-			// TODO add to the transaction pool file the transaction
-			system("pause");
+			// add the transaction to the txpool for miners to add
+			Blockchain::addToTransactionPool(filePath, privKey, pubKey, amount, address);
 			return 0;
 		}else if(argv[1] == std::string("mineBlock")){
 			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash> [<--metadata>]

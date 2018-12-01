@@ -28,4 +28,5 @@ public:
 	bool validateBlockTransactionSig(Block vBlock);
 	bool validateLastBlockUTXO(Block vBlock);
 	static Blockchain parseBlockchain(std::string filePath);
+	static void addToTransactionPool(std::string filePath, std::string privKey, std::string donor, int amount, std::string recepient);
 };

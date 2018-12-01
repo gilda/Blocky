@@ -239,17 +239,17 @@ bool Block::empty(){
 // returns vector of input that a transaction can use
 std::vector<Transaction> Block::getTransInputForValue(std::string file, std::string pubKey, int amount){
 	std::vector<Transaction> ret;
-	if(FileManager::isFile(file+".utxo")){
+	if(FileManager::isFile(file + ".utxo")){
 		std::string str;
 		int found = 0;
-		int length = FileManager::getLastLineNum(file+".utxo");
+		int length = FileManager::getLastLineNum(file + ".utxo");
 
 		// loop over utxo file
-		for(int i = 0; i<length && found<amount; i++){
-			Transaction trans = Transaction::parseTransaction(file+".utxo", i);
+		for(int i = 0; i < length && found < amount; i++){
+			Transaction trans = Transaction::parseTransaction(file + ".utxo", i);
 
 			// transaction belongs to pubKey
-			if(trans.getRecipient()==pubKey){
+			if(trans.getRecipient() == pubKey){
 				found += trans.getAmount();
 				ret.push_back(trans); // add to vector the file line index
 			}

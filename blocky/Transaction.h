@@ -33,5 +33,4 @@ public:
 	static Transaction parseTransaction(std::string file, int index);
 	bool empty();
 	bool operator==(Transaction);
-	static void addToTransactionPool(std::string filePath, std::string privKey, std::string donor, int amount, std::string recepient, std::vector<Transaction> input = std::vector<Transaction>());
 };

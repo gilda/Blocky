@@ -55,15 +55,15 @@ Transaction::Transaction() {
 std::string Transaction::stringify() {
 	std::string ret = "";
 	for(std::vector<Transaction>::iterator it = this->input.begin(); it!=input.end(); it++){
-		ret+=it->getHash() + ",";
+		ret += it->getHash() + ",";
 	}
-	ret+="N"+std::to_string(this->nonce)+
-		"{HASH"+
-		this->hash+"HASH["+
-		this->donor+"]>"+
-		std::to_string(this->amount)+"<("+
-		this->recipient+")SIG"+
-		this->signature+"SIG}";
+	ret += "N" + std::to_string(this->nonce) +
+		"{HASH" +
+		this->hash + "HASH[" +
+		this->donor + "]>" +
+		std::to_string(this->amount) + "<(" +
+		this->recipient + ")SIG" +
+		this->signature + "SIG}";
 	return ret;
 }
 
@@ -174,21 +174,4 @@ bool Transaction::empty(){
 
 bool Transaction::operator==(Transaction rhs){
 	return (this->donor==rhs.getDonor() && this->hash==rhs.getHash() && this->recipient == this->getRecipient() && this->signature == rhs.getSignature() && this->amount == rhs.getAmount());
-}
-
-// add the transaction to the transaction pool
-void Transaction::addToTransactionPool(std::string filePath, std::string privKey, std::string donor, int amount, std::string recepient, std::vector<Transaction> input){
-	// create the transaction and sign it
-	Transaction t = Transaction(donor, amount, recepient);
-	t.sign(privKey);
-	if(input.empty()){
-		input.push_back(t);
-		t.setInput(input);
-	}
-
-	// return if the file does not exist
-	if(!FileManager::isFile(filePath + ".txpl")){FileManager::openFile(filePath + ".txpl");}
-	
-	// add to the transaction pool the new transaction
-	FileManager::writeLine(filePath + ".txpl", t.stringify(), FileManager::getLastLineNum(filePath + ".txpl"));
 }

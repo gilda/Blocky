@@ -273,3 +273,23 @@ Blockchain Blockchain::parseBlockchain(std::string filePath){
 	// return fully parsed blockchain that was loaded to memory
 	return ret;
 }
+
+// add the transaction to the transaction pool
+void Blockchain::addToTransactionPool(std::string filePath, std::string privKey, std::string donor, int amount, std::string recepient){
+	// create the transaction and sign it
+	Transaction t = Transaction(donor, amount, recepient);
+	t.sign(privKey);
+
+	// find transaction input for the transaction, throw if non was found
+	t.setInput(Block::getTransInputForValue(filePath, donor, amount));
+	if(t.getInput().size() == 0){
+		printf("no valid input for this transaction!\n");
+		return;
+	}
+	
+	// open a new txpool if the file does not exist
+	if(!FileManager::isFile(filePath + ".txpl")){FileManager::openFile(filePath + ".txpl");}
+
+	// add to the transaction pool the new transaction
+	FileManager::writeLine(filePath + ".txpl", t.stringify(), FileManager::getLastLineNum(filePath + ".txpl"));
+}

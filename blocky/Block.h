@@ -35,6 +35,6 @@ public:
 	int verifyTransaction(Transaction trans, std::string sig, std::string pubKey);
 	static Block parseBlock(std::string file, int id);
 	bool empty();
-	std::vector<Transaction> getTransInputForValue(std::string file, std::string pubKey, int amount);
+	static std::vector<Transaction> getTransInputForValue(std::string file, std::string pubKey, int amount);
 	std::string getMetadata();
 };
