@@ -59,7 +59,12 @@ void Block::addTransaction(std::string file, std::string prikey, std::string don
 			this->numTrans++; // increment the number of transactions
 		}
 	}
+}
 
+// add a new transaction to the block
+// does not verify anything because blockchain will when this block will be added to the blockchain after beign mined
+void Block::addTransaction(Transaction t){
+	this->transactions.push_back(t);
 }
 
 // returns string for hashing

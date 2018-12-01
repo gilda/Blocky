@@ -170,10 +170,11 @@ int main(int argc, char* argv[]) {
 			Blockchain::addToTransactionPool(filePath, privKey, pubKey, amount, address);
 			return 0;
 		}else if(argv[1] == std::string("mineBlock")){
-			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash> [<--metadata>]
+			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>.. [<--metadata>]
 			// TODO add option for just line numbers in transaction pool file
-			// no transaction to add, only coinbase
-			if(argc < 6){
+			if(argc < 5){ // not enough parameters
+				return 1;
+			}else if(argc == 5){ // no transaction to add, only coinbase
 				std::string filePath = argv[2];
 				std::string privKey = argv[3];
 				std::string pubKey = argv[4];
@@ -208,10 +209,46 @@ int main(int argc, char* argv[]) {
 				Blockchain::parseBlockchain(filePath).addBlock(b);
 				return 0;
 			}else{
-				// TODO
+				// TODO loop through all argv[3++], construct block, mine it, and add it to the block file
+				std::string filePath = argv[2];
+				std::string privKey = argv[3];
+				std::string pubKey = argv[4];
+				std::string metadata = ""; // TODO
+				std::vector<std::string> transactions;
+				
+				if(!FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".txpl") || !FileManager::isFile(filePath + ".blck")){return 1;}
+			
+				// count the number of blocks in the blockchain
+				int numBlocks = 0;
+				if(FileManager::isFile(filePath + ".blck")){
+					for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
+						std::string str = FileManager::readLine(filePath + ".blck", i);
+						if(str.find("#") != -1) numBlocks++;
+					}
+				}
+
+				Block prev = Block::parseBlock(filePath + ".blck", numBlocks - 1);
+				Block b = Block(prev.getCurrHash(), prev.getId() + 1);
+
+				// add all of the tx hash to a vector
+				for(int i = 5; i < argc; i++){
+					transactions.push_back(argv[i]);
+					printf("added tx %s\n", argv[i]);
+				}
+				
+				// loop over all hashes and add them from tx pool
+				for(std::vector<std::string>::iterator it = transactions.begin(); it != transactions.end(); it++){
+					for(int i = 0; i < FileManager::getLastLineNum(filePath + ".txpl"); i++){
+						Transaction t = Transaction::parseTransaction(filePath + ".txpl", i);
+						if(t.getHash() == *it){b.addTransaction(t);}
+					}
+				}
+
+				b.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
+				Blockchain::parseBlockchain(filePath).addBlock(b);
+				return 0;
 			}
 
-			// TODO loop through all argv[3++], construct block, mine it, and add it to the block file
 			system("pause");
 			return 0;
 		}else if(argv[1] == std::string("verifyBlock")){

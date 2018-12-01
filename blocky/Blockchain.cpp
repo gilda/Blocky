@@ -292,4 +292,5 @@ void Blockchain::addToTransactionPool(std::string filePath, std::string privKey,
 
 	// add to the transaction pool the new transaction
 	FileManager::writeLine(filePath + ".txpl", t.stringify(), FileManager::getLastLineNum(filePath + ".txpl"));
+	printf("added transaction %s to the transaction pool successfully!\n", t.getHash());
 }

@@ -20,6 +20,7 @@ public:
 	Block(int id, std::string prevHash, long long int nonce, std::string currHash, std::vector<Transaction> transactions, int numTrans, std::string metadata = "");
 	Block();
 	void addTransaction(std::string file, std::string prikey, std::string donor, int amount, std::string recepient);
+	void addTransaction(Transaction t);
 	std::string hashBlock();
 	std::string stringify();
 	std::string stringifyBLCK();
