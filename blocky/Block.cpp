@@ -12,7 +12,6 @@ Block::Block(std::string prevHash, int id) {
 	this->transactions = std::vector<Transaction>(0);
 	this->transactions.resize(this->numTrans);
 	this->mined = false;
-	this->hashBlock();
 }
 
 // parser constructor
@@ -67,7 +66,7 @@ void Block::addTransaction(std::string file, std::string prikey, std::string don
 std::string Block::stringify(){
 	std::string rets =
 		std::to_string(this->id) + "#" +
-		this->prevHash + "|" +
+		this->prevHash + "|^" +
 		std::to_string(this->nonce) + "N" +
 		std::to_string(this->numTrans) + "T:" + 
 		this->metadata +"\n";
@@ -215,16 +214,15 @@ Block Block::parseBlock(std::string file, int id){
 	}
 
 	str = FileManager::readLine(file, line == 0 ? 0 : line-1);
-	std::vector<Transaction> empty(0);
-
 
 	// parse all parameters using delimeters in BLCK file
-	int numTrans = std::stoi(str.substr(str.find("N") + 1, str.find("T") - str.find("N") - 1));
 	int idParse = std::stoi(str.substr(0, str.find("#")));
 	std::string prevHash = str.substr(str.find("#") + 1, str.find("|")-str.find("#")-1);
 	long long int nonce = std::stoi(str.substr(str.find("^") + 1, str.find("N") - str.find("^") - 1));
 	std::string currHash = str.substr(str.find("|") + 1, str.find("^")-str.find("|") - 1);
-	std::string metadata = str.substr(str.find("T:") + 2, str.find("\n") - str.find("T:") - 2);
+	int numTrans = std::stoi(str.substr(str.find("N") + 1, str.find("T") - str.find("N") - 1));
+	std::vector<Transaction> empty(0);
+	std::string metadata = str.substr(str.find("T") + 2, str.find("\n") - str.find("T") - 2);
 
 	Block ret = Block(idParse, prevHash, nonce, currHash, empty, numTrans, metadata);
 
@@ -233,7 +231,6 @@ Block Block::parseBlock(std::string file, int id){
 		Transaction t = Transaction::parseTransaction(file, line + i);
 		ret.transactions.push_back(t);
 	}
-
 	return ret;
 }
 
