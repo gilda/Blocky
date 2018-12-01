@@ -76,6 +76,7 @@ std::string Block::stringify(){
 	for (std::vector<Transaction>::iterator it = trans.begin(); it != trans.end(); it++) {
 		rets += it->stringify() + ":\n";
 	}
+	rets = rets.substr(0, rets.length() - 1);
 	return rets;
 }
 
@@ -93,6 +94,8 @@ std::string Block::stringifyBLCK(){
 	for(std::vector<Transaction>::iterator it = trans.begin(); it!=trans.end(); it++){
 		rets += it->stringify()+":\n";
 	}
+	// remove the last \n from the tx
+	rets = rets.substr(0, rets.length() - 1);
 	return rets;
 }
 
