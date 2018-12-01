@@ -6,13 +6,12 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//TODO ordered by importance
 	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages
 	//TODO Block: 
 	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug, TODO maxMetadataChar check when adding block
 	//TODO Crypto: TODO genPubFromPriv()
 	//TODO GUI:
-	//TODO Transaction: 
+	//TODO Transaction: TODO nonces are always 41?
 	//TODO Util:
 	//TODO FileManager:
 
@@ -28,7 +27,7 @@ int main(int argc, char* argv[]) {
 	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward(), "Gilda mined this block!");
 	gldc.addBlock(b0);
 	
-	Block b1 = Block::parseBlock(gldc.getFilePath() + ".blck", 0);
+	/*Block b1 = Block::parseBlock(gldc.getFilePath() + ".blck", 0);
 	printf("%s\n", b1.stringifyBLCK().c_str());
 	
 	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
@@ -167,15 +166,49 @@ int main(int argc, char* argv[]) {
 			int amount = std::stoi(argv[5]);
 			std::string address = argv[6];
 
+			Transaction::addToTransactionPool(filePath, privKey, pubKey, amount, address);
 			// TODO add to the transaction pool file the transaction
 			system("pause");
 			return 0;
 		}else if(argv[1] == std::string("mineBlock")){
-			// syntax: blocky mineBlock <file path> <tranaction hash> [<--metadata>]
+			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash> [<--metadata>]
 			// TODO add option for just line numbers in transaction pool file
-			if(argc < 3){return 1;}
-			std::string filePath = argv[2];
-			
+			// no transaction to add, only coinbase
+			if(argc < 6){
+				std::string filePath = argv[2];
+				std::string privKey = argv[3];
+				std::string pubKey = argv[4];
+				std::string metadata = ""; // TODO
+
+				// count the number of blocks in the blockchain
+				int numBlocks = 0;
+				if(FileManager::isFile(filePath + ".blck")){
+					for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
+						std::string str = FileManager::readLine(filePath + ".blck", i);
+						if(str.find("#") != -1) numBlocks++;
+					}
+				}
+
+
+				// first block, dont bother finding the previous one
+				if(numBlocks == 0){
+					// create a block with id 0
+					Block b0 = Block(Util::Hash256(filePath), 0);
+					b0.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
+					// add the block after mining it
+					Blockchain::parseBlockchain(filePath).addBlock(b0);
+					return 0;
+				}
+				
+				// a prevoius block exists, find it
+				Block prev = Block::parseBlock(filePath + ".blck", numBlocks - 1);
+				Block b = Block(prev.getCurrHash(), prev.getId() + 1);
+				b.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
+				return 0;
+			}else{
+				// TODO
+			}
+
 			// TODO loop through all argv[3++], construct block, mine it, and add it to the block file
 			system("pause");
 			return 0;

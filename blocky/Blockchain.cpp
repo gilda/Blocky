@@ -10,7 +10,7 @@ Blockchain::Blockchain(std::string filePath, int difficulty, int reward, int max
 	this->maxMetadataChar = maxMetadataChar;
 
 	// check whether or not there is a blockchain metadata file
-	if(!FileManager::isFile(this->filePath+".meta")){
+	if(!FileManager::isFile(this->filePath+".meta") && filePath != ""){
 		FileManager::openFile(this->filePath+".meta");
 	}
 
@@ -129,7 +129,7 @@ Transaction Blockchain::getTransactionByHashUTXO(std::string hash){
 // validate that all the hashes in the block are valid and correct
 bool Blockchain::validateBlockHashes(Block vBlock){
 	// hash is not correct
-	if(vBlock.getCurrHash()!=Util::Hash256(vBlock.stringify())){
+	if(vBlock.getCurrHash() != Util::Hash256(vBlock.stringify())){
 		return false;
 	}
 	// block or last block were not mined properly
@@ -230,29 +230,37 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 
 Blockchain Blockchain::parseBlockchain(std::string filePath){
 	// TODO check and test
-	// check whether the files exist
-	if(!FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".meta")){return Blockchain("", 0, 0, 0,"");}
-	
-	std::string metadata = FileManager::readLine(filePath+".meta", 0);
-	Blockchain ret = Blockchain(filePath, std::stoi(metadata.substr(metadata.find("{") + 1, metadata.find("}"))), std::stoi(metadata.substr(metadata.find("[") + 1, metadata.find("]"))), std::stoi(metadata.substr(metadata.find("<") + 1, metadata.find(">"))), metadata.substr(0, metadata.find("{")));
+	// check and parse from the file
+	Blockchain ret = Blockchain("", 0, 0, 0, "");
+	if(FileManager::isFile(filePath + ".meta")){
+		std::string line = FileManager::readLine(filePath + ".meta", 0);
+		std::string name = line.substr(0, line.find("{"));
+		int difficulty = std::stoi(line.substr(line.find("{") + 1, line.find("[")));
+		int reward = std::stoi(line.substr(line.find("[") + 1, line.find("]")));
+		int maxMetadataChar = std::stoi(line.substr(line.find("<") + 1, line.find(">")));
+		ret = Blockchain(filePath, difficulty, reward, maxMetadataChar, name);
+	}
+
+	// add the blocks and utxo if any exist
+	if(!FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo")){return ret;}
 	
 	// count the blocks to add to the blockchain
 	int numBlocks = 0;
 	for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
-		if(FileManager::readLine(filePath + ".blck", i).find("}:\n") != std::string::npos){numBlocks++;}
+		if(FileManager::readLine(filePath + ".blck", i).find("#") != -1) numBlocks++;
 	}
 
 	// loop over and add all of the parsed blocks
 	for(int i = 0; i < numBlocks; i++){
 		// make sure the blockcs are valid
 		if(!ret.validateBlockHashes(Block::parseBlock(filePath + ".blck", i))){
-			printf("parsed blockchain is invalid\n");
+			printf("parsed blockchain is invalid (hash error)\n");
 			return ret;	
 		}else if(!ret.validateBlockTransactionSig(Block::parseBlock(filePath + ".blck", i))){
-			printf("parsed blockchain is invalid\n");
+			printf("parsed blockchain is invalid (transaction sig error)\n");
 			return ret;
-		}else if(Block::parseBlock(filePath + ".blck", i).getMetadata().length() < ret.maxMetadataChar){
-			printf("parsed blockchain is invalid\n");
+		}else if(Block::parseBlock(filePath + ".blck", i).getMetadata().length() > ret.maxMetadataChar){
+			printf("parsed blockchain is invalid (metadata overflow)\n");
 			return ret;
 		}
 

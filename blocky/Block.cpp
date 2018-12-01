@@ -12,6 +12,7 @@ Block::Block(std::string prevHash, int id) {
 	this->transactions = std::vector<Transaction>(0);
 	this->transactions.resize(this->numTrans);
 	this->mined = false;
+	this->hashBlock();
 }
 
 // parser constructor
