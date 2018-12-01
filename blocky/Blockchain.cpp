@@ -246,10 +246,13 @@ Blockchain Blockchain::parseBlockchain(std::string filePath){
 	for(int i = 0; i < numBlocks; i++){
 		// make sure the blockcs are valid
 		if(ret.validateBlockHashes(Block::parseBlock(filePath + ".blck", i)) != true){
-			printf("parsed blockchain is invalid");
+			printf("parsed blockchain is invalid\n");
 			return ret;	
 		}else if(ret.validateBlockTransactionSig(Block::parseBlock(filePath + ".blck", i)) != true){
-			printf("parsed blockchain is invalid");
+			printf("parsed blockchain is invalid\n");
+			return ret;
+		}else if(Block::parseBlock(filePath + ".blck", i).getMetadata().length() < ret.maxMetadataChar){
+			printf("parsed blockchain is invalid\n");
 			return ret;
 		}
 

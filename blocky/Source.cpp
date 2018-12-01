@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 	//TODO Util:
 	//TODO FileManager:
 
-	remove(std::string("gldc.utxo").c_str());
+	/*remove(std::string("gldc.utxo").c_str());
 	remove(std::string("gldc.blck").c_str());
 	remove(std::string("gldc.meta").c_str());
 	Blockchain gldc = Blockchain("gldc", 16, 10, 40, "gilda");
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 	
 	Block b1 = Block::parseBlock(gldc.getFilePath() + ".blck", 0);
 	printf("%s\n", b1.stringifyBLCK().c_str());
-	/*
+	
 	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
 	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
 	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
@@ -158,8 +158,8 @@ int main(int argc, char* argv[]) {
 			// loop through all of UTXO file and accumulate balance of address
 			system("pause");
 			return 0;
-		}else if(argv[1] == std::string("sendTransaction")){
-			// syntax: blocky sendTransaction <file path> <private key> <public key> <amount> <address>
+		}else if(argv[1] == std::string("addTransaction")){
+			// syntax: blocky addTransaction <file path> <private key> <public key> <amount> <address>
 			if(argc < 7){return 1;}
 			std::string filePath = argv[2];
 			std::string privKey = argv[3];
