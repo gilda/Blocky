@@ -55,13 +55,13 @@ std::string Blockchain::getFilePath(){
 
 // adds a new empty block to the block chain
 void Blockchain::addBlock(Block blockToAdd) {
-	if(this->validateBlockHashes(blockToAdd) != true){
+	if(!this->validateBlockHashes(blockToAdd)){
 		printf("hash wrong!\n");
 		return;
-	}else if(this->validateBlockTransactionSig(blockToAdd) != true){
+	}else if(!this->validateBlockTransactionSig(blockToAdd)){
 		printf("tx signatures wrong!\n");
 		return;
-	}else if(this->validateLastBlockUTXO(blockToAdd) != true){
+	}else if(!this->validateLastBlockUTXO(blockToAdd)){
 		printf("last block utxo wrong!\n");
 		return;
 	}else if(this->maxMetadataChar < blockToAdd.getMetadata().length()){
@@ -245,10 +245,10 @@ Blockchain Blockchain::parseBlockchain(std::string filePath){
 	// loop over and add all of the parsed blocks
 	for(int i = 0; i < numBlocks; i++){
 		// make sure the blockcs are valid
-		if(ret.validateBlockHashes(Block::parseBlock(filePath + ".blck", i)) != true){
+		if(!ret.validateBlockHashes(Block::parseBlock(filePath + ".blck", i))){
 			printf("parsed blockchain is invalid\n");
 			return ret;	
-		}else if(ret.validateBlockTransactionSig(Block::parseBlock(filePath + ".blck", i)) != true){
+		}else if(!ret.validateBlockTransactionSig(Block::parseBlock(filePath + ".blck", i))){
 			printf("parsed blockchain is invalid\n");
 			return ret;
 		}else if(Block::parseBlock(filePath + ".blck", i).getMetadata().length() < ret.maxMetadataChar){

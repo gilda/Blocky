@@ -110,7 +110,7 @@ std::string Block::toString() {
 		"mined: " + (this->mined ? "true" : "false") + "\r\n" +
 		"currHash: " + this->currHash + "\r\n" +
 		"numTrans: " + std::to_string(this->numTrans) + 
-		"metadata" this->metadata + "\r\n\r\n";
+		"metadata" + this->metadata + "\r\n\r\n";
 	// loop over all transactions
 	int index = 0;
 	std::vector<Transaction> trans = this->transactions;
@@ -131,7 +131,7 @@ bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubK
 	this->numTrans++;
 
 	this->metadata = metadata;
-	puts("starting to mine...");
+	printf("starting to mine...");
 	printf("%s", ("raw data:\r\n" + this->stringify() + "\r\n").c_str());
 	// start clock
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
