@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
 	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs
 	//Block: 
 	//Blockchain: TODO 3 block UTXO bug
-	//Crypto: TODO genPubFromPriv(), TODO format hex properly (0x and low caps)
+	//Crypto: TODO format hex properly (0x and low caps)
 	//GUI:
 	//Transaction:
 	//Util:
@@ -139,18 +139,27 @@ int main(int argc, char* argv[]) {
 			// syntax: blocky genKey
 			// TODO add parameter for deriving public from private
 			Util::initOpenSSL();
-			// create a new key pair
-			EC_KEY *newKey = Crypto::genKey();
 			
-			// prompt the user
-			printf("this is your new public key, you can send this key to others so they can send you some tokens:\n%s\n", Util::base58Encode(Crypto::getPublicString(newKey)).c_str());
-			printf("if you are ready, press any key to view your private key\n");
-			system("pause");
-			printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
-			
-			// clean the OpenSSL library
-			Util::cleanupOpenSSL();
-			return 0;
+			// gen new key
+			if(argc == 2){
+				// create a new key pair
+				EC_KEY *newKey = Crypto::genKey();
+
+				// prompt the user
+				printf("this is your new public key, you can send this key to others so they can send you some tokens:\n%s\n", Util::base58Encode(Crypto::getPublicString(newKey)).c_str());
+				printf("if you are ready, press any key to view your private key\n");
+				system("pause");
+				printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
+
+				// clean the OpenSSL library
+				Util::cleanupOpenSSL();
+				return 0;
+			}else{
+				// derive from private key
+				printf("the corresponding public key for this private key is: %s\n", Util::base58Encode(Crypto::derivePublicFromPrivate(Util::base58Decode(argv[2]))).c_str());
+				Util::cleanupOpenSSL();
+				return 0;
+			}
 		}else if(argv[1] == std::string("getBalance")){
 			// syntax: blocky getBalance <file path> <address>
 			if(argc < 3){return 1;}
