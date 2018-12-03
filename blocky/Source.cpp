@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
 	Blockchain parsed = Blockchain::parseBlockchain("gldc");*/
 	
 	// parse command line arguments and act accordingly
+
 	if(argc <= 1){
 		printf("%s", Util::helpText().c_str());
 		system("pause");
@@ -58,6 +59,9 @@ int main(int argc, char* argv[]) {
 			// syntax: blocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>
 			// parse the command line argumenst
 			if(argc < 7){return 1;}
+			// init the OpenSSL library
+			Util::initOpenSSL();
+
 			std::string filePath = argv[2];
 			int difficulty = std::stoi(argv[3]);
 			int reward = std::stoi(argv[4]);
@@ -68,6 +72,8 @@ int main(int argc, char* argv[]) {
 			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, maxMetadataChar,name);
 			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d", name.c_str(), filePath.c_str(), difficulty, reward);
 			
+			// clean the OpenSSL library
+			Util::cleanupOpenSSL();
 			return 0;
 		}else if(argv[1] == std::string("printBlockchainParams")){ // print the init params of some blockchain
 			// syntax: blocky printBlockchainParams <filePath>
@@ -145,6 +151,7 @@ int main(int argc, char* argv[]) {
 			system("pause");
 			printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
 			
+			// clean the OpenSSL library
 			Util::cleanupOpenSSL();
 			return 0;
 		}else if(argv[1] == std::string("getBalance")){
@@ -159,6 +166,9 @@ int main(int argc, char* argv[]) {
 		}else if(argv[1] == std::string("addTransaction")){
 			// syntax: blocky addTransaction <file path> <private key> <public key> <amount> <address>
 			if(argc < 7){return 1;}
+			// init the OpenSSL library
+			Util::initOpenSSL();
+
 			std::string filePath = argv[2];
 			std::string privKey = argv[3];
 			std::string pubKey = argv[4];
@@ -167,6 +177,9 @@ int main(int argc, char* argv[]) {
 
 			// add the transaction to the txpool for miners to add
 			Blockchain::addToTransactionPool(filePath, privKey, pubKey, amount, address);
+			
+			// clean the OpenSSL library
+			Util::cleanupOpenSSL();
 			return 0;
 		}else if(argv[1] == std::string("mineBlock")){
 			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]
@@ -174,6 +187,9 @@ int main(int argc, char* argv[]) {
 			if(argc < 5){ // not enough parameters
 				return 1;
 			}else if(argc == 5){ // no transaction to add, only coinbase
+				// init the OpenSSL library
+				Util::initOpenSSL();
+				
 				std::string filePath = argv[2];
 				std::string privKey = argv[3];
 				std::string pubKey = argv[4];
@@ -196,6 +212,9 @@ int main(int argc, char* argv[]) {
 					b0.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
 					// add the block after mining it
 					Blockchain::parseBlockchain(filePath).addBlock(b0);
+					
+					// clean the OpenSSL library
+					Util::cleanupOpenSSL();
 					return 0;
 				}
 				
@@ -206,9 +225,14 @@ int main(int argc, char* argv[]) {
 				// mine the block and add it to the blockchain
 				b.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
 				Blockchain::parseBlockchain(filePath).addBlock(b);
+				
+				// clean the OpenSSL library
+				Util::cleanupOpenSSL();
 				return 0;
 			}else{
-				// TODO loop through all argv[3++], construct block, mine it, and add it to the block file
+				// init the OpenSSL library
+				Util::initOpenSSL();
+
 				std::string filePath = argv[2];
 				std::string privKey = argv[3];
 				std::string pubKey = argv[4];
@@ -245,6 +269,9 @@ int main(int argc, char* argv[]) {
 
 				b.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
 				Blockchain::parseBlockchain(filePath).addBlock(b);
+				
+				// clean the OpenSSL library
+				Util::cleanupOpenSSL();
 				return 0;
 			}
 		}else if(argv[1] == std::string("verifyBlock")){
