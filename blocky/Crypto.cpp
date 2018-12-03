@@ -12,6 +12,24 @@ namespace Crypto {
 		return ec_key;
 	}
 
+	// derive the public key from the private key
+	std::string derivePublicFromPrivate(std::string privKey){
+		EC_KEY *ec_key = EC_KEY_new();
+		EC_GROUP *ec_group = EC_GROUP_new_by_curve_name(NID_secp256k1);
+		EC_KEY_set_group(ec_key, ec_group); // allocate memory and init key
+		BIGNUM *bnPriv = BN_new();
+		BN_hex2bn(&bnPriv, privKey.c_str()); // parse private key
+		EC_KEY_set_private_key(ec_key, bnPriv); // set private part to parsed BN
+
+		EC_POINT *r = EC_POINT_new(ec_group);
+		BIGNUM *zero = BN_new();
+		BN_set_word(zero, 0);
+		EC_POINT_mul(ec_group, r, bnPriv, EC_POINT_new(ec_group), zero, NULL);
+		
+		EC_KEY_set_public_key(ec_key, r);
+		return getPublicString(ec_key);
+	}
+
 	// returns the string of public key given
 	// not base58 encoded
 	std::string getPublicString(EC_KEY *key) {
@@ -30,22 +48,6 @@ namespace Crypto {
 		const BIGNUM *priv = EC_KEY_get0_private_key(key);
 		std::string ret = BN_bn2hex(priv);
 		return ret;
-	}
-
-	// sets the public string of key
-	void setPublicString(EC_KEY *key, std::string pubKey){
-		BIGNUM *pubKeyx = BN_new();
-		BN_hex2bn(&pubKeyx, pubKey.substr(0, 64).c_str()); // parse x part
-		int ybit; // ybit on y is positive or negative
-		sscanf_s(pubKey.substr(64, 1).c_str(), "%d", &ybit); // parse y bit
-		EC_POINT *pubKeyPoint = EC_POINT_new(EC_KEY_get0_group(key)); // init point
-	}
-
-	// sets the private part of key
-	void setPrivateString(EC_KEY *key, std::string privKey){
-		BIGNUM *bnPriv = BN_new();
-		BN_hex2bn(&bnPriv, privKey.c_str()); // parse private key
-		EC_KEY_set_private_key(key, bnPriv); // set private part to parsed BN
 	}
 
 	// return the signature of the message by private key

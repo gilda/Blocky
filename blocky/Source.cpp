@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
 	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs
 	//Block: 
 	//Blockchain: TODO 3 block UTXO bug
-	//Crypto: TODO genPubFromPriv()
+	//Crypto: TODO genPubFromPriv(), TODO format hex properly (0x and low caps)
 	//GUI:
 	//Transaction:
 	//Util:
@@ -43,7 +43,6 @@ int main(int argc, char* argv[]) {
 	Blockchain parsed = Blockchain::parseBlockchain("gldc");*/
 	
 	// parse command line arguments and act accordingly
-
 	if(argc <= 1){
 		printf("%s", Util::helpText().c_str());
 		system("pause");
