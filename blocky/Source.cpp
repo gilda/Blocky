@@ -6,14 +6,14 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//TODO CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs
-	//TODO Block: 
-	//TODO Blockchain: TODO parseBlockchain test and check, TODO 3 block UTXO bug, TODO maxMetadataChar check when adding block
-	//TODO Crypto: TODO genPubFromPriv()
-	//TODO GUI:
-	//TODO Transaction: TODO nonces are always 41?
-	//TODO Util:
-	//TODO FileManager:
+	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs
+	//Block: 
+	//Blockchain: TODO 3 block UTXO bug
+	//Crypto: TODO genPubFromPriv()
+	//GUI:
+	//Transaction:
+	//Util:
+	//FileManager:
 
 	/*remove(std::string("gldc.utxo").c_str());
 	remove(std::string("gldc.blck").c_str());
@@ -82,15 +82,13 @@ int main(int argc, char* argv[]) {
 			// check that the metadata file exists
 			if(!FileManager::isFile(filePath + ".meta")){return 1;}
 
-			// parse the metadata file and print it's contents
-			std::string line = FileManager::readLine(filePath + ".meta", 0);
-			std::string name = line.substr(0, line.find("{"));
-			int diffculty = std::stoi(line.substr(line.find("{") + 1, line.find("[")));
-			int reward = std::stoi(line.substr(line.find("[") + 1, line.find("]")));
-			// TODO possibly use Blockchian.parseBlockchain(filePath);
-
+			// parse and print the parameters
+			std::string name = Blockchain::parseBlockchain(filePath).getName();
+			int difficulty = Blockchain::parseBlockchain(filePath).getDifficulty();
+			int reward = Blockchain::parseBlockchain(filePath).getReward();
+			
 			// output the relevant data
-			printf("this is the blockchain file path for a blockchain named %s with mining diffculty of %d and block reward of %d", name.c_str(), diffculty, reward);
+			printf("this is the blockchain file path for a blockchain named %s with mining difficulty of %d and block reward of %d", name.c_str(), difficulty, reward);
 			
 			return 0;
 		}else if(argv[1] == std::string("printBlock")){

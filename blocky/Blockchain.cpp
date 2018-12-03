@@ -8,6 +8,7 @@ Blockchain::Blockchain(std::string filePath, int difficulty, int reward, int max
 	this->numBlocks = 0;
 	this->reward = reward;
 	this->maxMetadataChar = maxMetadataChar;
+	this->name = name;
 
 	// check whether or not there is a blockchain metadata file
 	if(!FileManager::isFile(this->filePath+".meta") && filePath != ""){
@@ -15,7 +16,7 @@ Blockchain::Blockchain(std::string filePath, int difficulty, int reward, int max
 	}
 
 	// write all of the metadata to the file
-	FileManager::writeLine(this->filePath+".meta", name+"{"+std::to_string(this->difficulty)+"}["+std::to_string(this->reward)+"]<" + std::to_string(this->maxMetadataChar) + ">", 0);
+	FileManager::writeLine(this->filePath+".meta", this->name+"{"+std::to_string(this->difficulty)+"}["+std::to_string(this->reward)+"]<" + std::to_string(this->maxMetadataChar) + ">", 0);
 	
 	// create genesis block
 	this->blocks = std::vector<Block>(0);
@@ -34,12 +35,24 @@ Block *Blockchain::getBlock(int index){
 	return ret;
 }
 
+// returns the mining diffculty of this blockchain
 int Blockchain::getDifficulty(){
 	return this->difficulty;
 }
 
+// returns the mining reward for this blockchain
 int Blockchain::getReward(){
 	return this->reward;
+}
+
+// return the name for this blockchain
+std::string Blockchain::getName(){
+	return this->name;
+}
+
+// returns the max metadata char count allowed for blocks in this blockchain
+int Blockchain::getMaxMetadataChar(){
+	return this->maxMetadataChar;
 }
 
 // gets the last block
@@ -235,15 +248,14 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 }
 
 Blockchain Blockchain::parseBlockchain(std::string filePath){
-	// TODO check and test
 	// check and parse from the file
 	Blockchain ret = Blockchain("", 0, 0, 0, "");
 	if(FileManager::isFile(filePath + ".meta")){
 		std::string line = FileManager::readLine(filePath + ".meta", 0);
 		std::string name = line.substr(0, line.find("{"));
-		int difficulty = std::stoi(line.substr(line.find("{") + 1, line.find("[")));
-		int reward = std::stoi(line.substr(line.find("[") + 1, line.find("]")));
-		int maxMetadataChar = std::stoi(line.substr(line.find("<") + 1, line.find(">")));
+		int difficulty = std::stoi(line.substr(line.find("{") + 1, line.find("}") - line.find("{") - 1));
+		int reward = std::stoi(line.substr(line.find("[") + 1, line.find("]") - line.find("[") - 1));
+		int maxMetadataChar = std::stoi(line.substr(line.find("<") + 1, line.find(">") - line.find("<") - 1));
 		ret = Blockchain(filePath, difficulty, reward, maxMetadataChar, name);
 	}
 

@@ -10,6 +10,7 @@ class Blockchain {
 	int difficulty;
 	int reward;
 	unsigned int maxMetadataChar;
+	std::string name;
 
 public:
 
@@ -19,6 +20,8 @@ public:
 	Block *getBlock(int index);
 	int getDifficulty();
 	int getReward();
+	std::string getName();
+	int getMaxMetadataChar();
 	std::string getFilePath();
 	void addBlock(Block blockToAdd);
 	void writeTransactionUTXO(Transaction trans);
