@@ -92,8 +92,19 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("printBlock")){
 			// TODO add option for metadata printage
-			// syntax: blocky printBlock <file path> <block height>
-			if(argc < 4){return 1;}
+			// syntax: blocky printBlock <file path> <block height> [--metadata]
+			
+			// search for the --metadata option
+			bool metadata = false;
+			for(int i = 0; i < argc; i++){
+				if(argv[i] == std::string("--metadata")){
+					metadata = !metadata;
+					break;
+				}
+			}
+
+			// make sure there are enough arguments
+			if(argc < 4 && !metadata){return 1;}
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
 
@@ -104,8 +115,7 @@ int main(int argc, char* argv[]) {
 			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){return 1;}
 			
 			// find block in block file and print the entire block with metadata
-			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight).toString().c_str());
-
+			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight).toString(metadata).c_str());
 			return 0;
 		}else if(argv[1] == std::string("printTransaction")){
 			// syntax: blocky printTransaction <file path> <transaction hash>
@@ -199,7 +209,7 @@ int main(int argc, char* argv[]) {
 				std::string filePath = argv[2];
 				std::string privKey = argv[3];
 				std::string pubKey = argv[4];
-				std::string metadata = ""; // TODO
+				std::string metadata = ""; // no metadata to add by the number of arguments
 
 				// count the number of blocks in the blockchain
 				int numBlocks = 0;
@@ -209,7 +219,6 @@ int main(int argc, char* argv[]) {
 						if(str.find("#") != -1) numBlocks++;
 					}
 				}
-
 
 				// first block, dont bother finding the previous one
 				if(numBlocks == 0){
@@ -245,8 +254,15 @@ int main(int argc, char* argv[]) {
 				std::string metadata = ""; // TODO
 				std::vector<std::string> transactions;
 				
-				if(!FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".txpl") || !FileManager::isFile(filePath + ".blck")){return 1;}
-			
+				// find the metadata argument
+				for(int i = 0; i < argc; i++){
+					if(argv[i] == std::string("--metadata")){
+						metadata = argv[i + 1];
+						break;
+					}
+				}
+
+
 				// count the number of blocks in the blockchain
 				int numBlocks = 0;
 				if(FileManager::isFile(filePath + ".blck")){
@@ -255,6 +271,21 @@ int main(int argc, char* argv[]) {
 						if(str.find("#") != -1) numBlocks++;
 					}
 				}
+
+				// first block, dont bother finding the previous one
+				if(numBlocks == 0){
+					// create a block with id 0
+					Block b0 = Block(Util::Hash256(filePath), 0);
+					b0.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
+					// add the block after mining it
+					Blockchain::parseBlockchain(filePath).addBlock(b0);
+
+					// clean the OpenSSL library
+					Util::cleanupOpenSSL();
+					return 0;
+				}
+
+				if(!FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".txpl") || !FileManager::isFile(filePath + ".blck")){return 1;}
 
 				Block prev = Block::parseBlock(filePath + ".blck", numBlocks - 1);
 				Block b = Block(prev.getCurrHash(), prev.getId() + 1);
@@ -273,6 +304,7 @@ int main(int argc, char* argv[]) {
 					}
 				}
 
+				// mine and add the block to the chain
 				b.mine(Blockchain::parseBlockchain(filePath).getDifficulty(), privKey, pubKey, Blockchain::parseBlockchain(filePath).getReward(), metadata);
 				Blockchain::parseBlockchain(filePath).addBlock(b);
 				

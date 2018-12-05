@@ -110,14 +110,14 @@ std::string Block::hashBlock() {
 }
 
 // returns string with all parameters for debugging and viewing
-std::string Block::toString() {
+std::string Block::toString(bool printMetadata) {
 	std::string rets =
 		"block id: " + std::to_string(this->id) + "\r\n" +
 		"prevHash: 0x" + this->prevHash + "\r\n" +
 		"nonce: " + std::to_string(this->nonce) + "\r\n" +
 		"currHash: 0x" + this->currHash + "\r\n" +
 		"numTrans: " + std::to_string(this->numTrans) + "\n"
-		"metadata:" + this->metadata + "\r\n\r\n";
+		 + (printMetadata ? ("metadata: " + this->metadata + "\n\n") : "\n\n");
 	// loop over all transactions
 	int index = 0;
 	std::vector<Transaction> trans = this->transactions;

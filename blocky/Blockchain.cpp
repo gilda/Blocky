@@ -77,7 +77,8 @@ void Blockchain::addBlock(Block blockToAdd) {
 	}else if(!this->validateLastBlockUTXO(blockToAdd)){
 		printf("last block utxo wrong!\n");
 		return;
-	}else if(this->maxMetadataChar < blockToAdd.getMetadata().length()){
+	}else if(this->maxMetadataChar > blockToAdd.getMetadata().length()){
+		printf("maximum block metadata char count was exceeded!\n");
 		return;
 	}
 	

@@ -197,7 +197,7 @@ namespace Util {
 			"\tblocky genKey\tgenerate a new keypair\n"
 			"\tblocky getBalance <file path> <address>\tdisplays the balance of a given address\n"
 			"\tblocky addTransaction <file path> <private key> <public key> <amount> <address>\tadds a new transaction to the transaction pool\n"
-			"\tblocky blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]\t create mine and add a new block to the blockchain\n"
+			"\tblocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]\t create mine and add a new block to the blockchain\n"
 			"\tblocky verifyBlock <file path> <block height>\treturns whether or not a block in the blockchain is valid\n"
 			"\tblocky verifyBlockchain <file path>\treturns whether or not the entire blockchain is valid\n";
 		return help;

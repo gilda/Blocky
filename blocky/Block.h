@@ -24,7 +24,7 @@ public:
 	std::string hashBlock();
 	std::string stringify();
 	std::string stringifyBLCK();
-	std::string toString();
+	std::string toString(bool printMetadata = false);
 	bool mine(int difficulty, std::string minerPrivKey, std::string minerPubKey, int reward, std::string metadata = "");
 	Transaction *getLastTransaction();
 	Transaction *getTransaction(int index);
