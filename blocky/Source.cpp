@@ -91,7 +91,6 @@ int main(int argc, char* argv[]) {
 			
 			return 0;
 		}else if(argv[1] == std::string("printBlock")){
-			// TODO add option for metadata printage
 			// syntax: blocky printBlock <file path> <block height> [--metadata]
 			
 			// search for the --metadata option
@@ -147,7 +146,6 @@ int main(int argc, char* argv[]) {
 			return 1;
 		}else if(argv[1] == std::string("genKey")){
 			// syntax: blocky genKey
-			// TODO add parameter for deriving public from private
 			Util::initOpenSSL();
 			
 			// gen new key
@@ -172,12 +170,25 @@ int main(int argc, char* argv[]) {
 			}
 		}else if(argv[1] == std::string("getBalance")){
 			// syntax: blocky getBalance <file path> <address>
-			if(argc < 3){return 1;}
+			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
 			std::string address = argv[3];
 
-			// TODO loop through all of UTXO file and accumulate balance of address
-			system("pause");
+			// make sure the file exists
+			if(!FileManager::isFile(filePath + ".utxo")){return 1;}
+
+			int balance = 0;
+			// loop through all of UTXO file and accumulate balance of address
+			for(int i = 0; i < FileManager::getLastLineNum(filePath + ".utxo"); i++){
+				Transaction t = Transaction::parseTransaction(filePath + ".utxo", i);
+				// same address add the values
+				if(t.getDonor() == address){
+					balance += t.getAmount();
+				}
+			}
+
+			// output the address
+			printf("the account %s has %d %s in it's balance\n", address.c_str(), balance, Blockchain::parseBlockchain(filePath).getName().c_str());
 			return 0;
 		}else if(argv[1] == std::string("addTransaction")){
 			// syntax: blocky addTransaction <file path> <private key> <public key> <amount> <address>
