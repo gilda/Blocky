@@ -176,7 +176,7 @@ int main(int argc, char* argv[]) {
 			std::string filePath = argv[2];
 			std::string address = argv[3];
 
-			// loop through all of UTXO file and accumulate balance of address
+			// TODO loop through all of UTXO file and accumulate balance of address
 			system("pause");
 			return 0;
 		}else if(argv[1] == std::string("addTransaction")){
@@ -199,7 +199,6 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("mineBlock")){
 			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]
-			// TODO add option for just line numbers in transaction pool file
 			if(argc < 5){ // not enough parameters
 				return 1;
 			}else if(argc == 5){ // no transaction to add, only coinbase
@@ -262,7 +261,6 @@ int main(int argc, char* argv[]) {
 					}
 				}
 
-
 				// count the number of blocks in the blockchain
 				int numBlocks = 0;
 				if(FileManager::isFile(filePath + ".blck")){
@@ -290,7 +288,7 @@ int main(int argc, char* argv[]) {
 				Block prev = Block::parseBlock(filePath + ".blck", numBlocks - 1);
 				Block b = Block(prev.getCurrHash(), prev.getId() + 1);
 
-				// add all of the tx hash to a vector
+				// add all of the tx hash to a vector of string type
 				for(int i = 5; i < argc; i++){
 					transactions.push_back(argv[i]);					
 					printf("added transaction 0x%s to the block\n", argv[i]);
@@ -300,7 +298,11 @@ int main(int argc, char* argv[]) {
 				for(std::vector<std::string>::iterator it = transactions.begin(); it != transactions.end(); it++){
 					for(int i = 0; i < FileManager::getLastLineNum(filePath + ".txpl"); i++){
 						Transaction t = Transaction::parseTransaction(filePath + ".txpl", i);
-						if(t.getHash() == *it){b.addTransaction(t);}
+						if(t.getHash() == *it){
+							b.addTransaction(t);
+							// remove the line from the tx pool
+							FileManager::deleteLine(filePath + ".txpl", i);
+						}
 					}
 				}
 
