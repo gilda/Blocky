@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
 			for(int i = 0; i < FileManager::getLastLineNum(filePath + ".utxo"); i++){
 				Transaction t = Transaction::parseTransaction(filePath + ".utxo", i);
 				// same address add the values
-				if(t.getDonor() == address){
+				if(t.getRecipient() == address){
 					balance += t.getAmount();
 				}
 			}
