@@ -310,7 +310,7 @@ int main(int argc, char* argv[]) {
 						Transaction t = Transaction::parseTransaction(filePath + ".txpl", i);
 						if(t.getHash() == *it){
 							b.addTransaction(t);
-							printf("added transaction 0x%s to the block\n", argv[i]);
+							printf("added transaction 0x%s to the block\n", t.getHash().c_str());
 							// remove the line from the tx pool
 							FileManager::deleteLine(filePath + ".txpl", i);
 						}

@@ -197,7 +197,7 @@ bool Blockchain::validateLastBlockUTXO(Block vBlock){
 					}
 				}
 			}
-			printf("paid: %d\n", paid);
+
 			// after finding all inputs, make sure paid is larger than the sum
 			if(paid < it->getAmount()){
 				return false;
@@ -305,10 +305,30 @@ void Blockchain::addToTransactionPool(std::string filePath, std::string privKey,
 		return;
 	}
 	
+	// find the amount of input that was found
+	std::string str;
+	int found = 0;
+	int length = FileManager::getLastLineNum(filePath + ".utxo");
+
+	// loop over utxo file
+	for(int i = 0; i < length && found < amount; i++){
+		Transaction trans = Transaction::parseTransaction(filePath + ".utxo", i);
+
+		// transaction belongs to pubKey
+		if(trans.getRecipient() == donor){
+			found += trans.getAmount();
+		}
+	}
+
+	// create and add the change transaction
+	Transaction change = Transaction(t.getInput(), "", donor, found - amount, donor, "");
+	change.sign(privKey);
+	
 	// open a new txpool if the file does not exist
 	if(!FileManager::isFile(filePath + ".txpl")){FileManager::openFile(filePath + ".txpl");}
 
 	// add to the transaction pool the new transaction
 	FileManager::writeLine(filePath + ".txpl", t.stringify(), FileManager::getLastLineNum(filePath + ".txpl"));
-	printf("added transaction %s to the transaction pool successfully!\n", t.getHash().c_str());
+	FileManager::writeLine(filePath + ".txpl", change.stringify(), FileManager::getLastLineNum(filePath + ".txpl"));
+	printf("added transaction %s to the transaction pool successfully with change transaction %s!\n", t.getHash().c_str(), change.getHash().c_str());
 }
