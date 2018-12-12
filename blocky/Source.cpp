@@ -291,7 +291,6 @@ int main(int argc, char* argv[]) {
 				// add all of the tx hash to a vector of string type
 				for(int i = 5; i < argc; i++){
 					transactions.push_back(argv[i]);					
-					printf("added transaction 0x%s to the block\n", argv[i]);
 				}
 				
 				// loop over all hashes and add them from tx pool
@@ -300,6 +299,7 @@ int main(int argc, char* argv[]) {
 						Transaction t = Transaction::parseTransaction(filePath + ".txpl", i);
 						if(t.getHash() == *it){
 							b.addTransaction(t);
+							printf("added transaction 0x%s to the block\n", argv[i]);
 							// remove the line from the tx pool
 							FileManager::deleteLine(filePath + ".txpl", i);
 						}
