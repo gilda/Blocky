@@ -69,16 +69,16 @@ std::string Blockchain::getFilePath(){
 // adds a new empty block to the block chain
 void Blockchain::addBlock(Block blockToAdd) {
 	if(!this->validateBlockHashes(blockToAdd)){
-		printf("hash wrong!\n");
+		printf("cant add block, hash wrong!\n");
 		return;
 	}else if(!this->validateBlockTransactionSig(blockToAdd)){
-		printf("tx signatures wrong!\n");
+		printf("cand add block, transactions signatures wrong!\n");
 		return;
 	}else if(!this->validateLastBlockUTXO(blockToAdd)){
-		printf("last block utxo wrong!\n");
+		printf("cant add block, last block utxo wrong!\n");
 		return;
 	}else if(this->maxMetadataChar < blockToAdd.getMetadata().length()){
-		printf("maximum block metadata char count was exceeded!\n");
+		printf("cant add block, maximum block metadata char count was exceeded!\n");
 		return;
 	}
 	
@@ -144,7 +144,7 @@ Transaction Blockchain::getTransactionByHashUTXO(std::string hash){
 bool Blockchain::validateBlockHashes(Block vBlock){
 	// hash is not correct
 	if(vBlock.getCurrHash() != Util::Hash256(vBlock.stringify())){
-		printf("current hash is incorrect\n");
+		printf("current hash of block is invalid!\n");
 		return false;
 	}
 	// block or last block were not mined properly
@@ -280,7 +280,7 @@ Blockchain Blockchain::parseBlockchain(std::string filePath){
 			printf("parsed blockchain is invalid (transaction sig error)\n");
 			return ret;
 		}else if(Block::parseBlock(filePath + ".blck", i).getMetadata().length() > ret.maxMetadataChar){
-			printf("parsed blockchain is invalid (metadata overflow)\n");
+			printf("parsed blockchain is invalid (metadata length exceeded)\n");
 			return ret;
 		}
 

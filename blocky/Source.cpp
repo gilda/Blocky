@@ -6,7 +6,7 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc, TODO test verification of tx blck blckchn
+	//CLI: TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc, TODO test verification of tx blck blckchn
 	//Block: TODO think about verifyBlock verifying the shit out of the block
 	//Blockchain: TODO 3 block UTXO bug
 	//Crypto: TODO format hex properly (0x and low caps)
@@ -14,33 +14,6 @@ int main(int argc, char* argv[]) {
 	//Transaction: TODO think about verifyTransaction verifying the shit out of the Transaction
 	//Util:
 	//FileManager:
-
-	/*remove(std::string("gldc.utxo").c_str());
-	remove(std::string("gldc.blck").c_str());
-	remove(std::string("gldc.meta").c_str());
-	Blockchain gldc = Blockchain("gldc", 16, 10, 40, "gilda");
-
-	EC_KEY *key = Crypto::genKey();
-	EC_KEY *key1 = Crypto::genKey();
-
-	Block b0 = Block(Util::Hash256(gldc.getFilePath()), 0);
-	b0.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward(), "Gilda mined this block!");
-	gldc.addBlock(b0);
-	
-	/*Block b1 = Block::parseBlock(gldc.getFilePath() + ".blck", 0);
-	printf("%s\n", b1.stringifyBLCK().c_str());
-	
-	Block b1 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
-	b1.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
-	b1.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
-	gldc.addBlock(b1);
-
-	Block b2 = Block(gldc.getLastBlock()->getCurrHash(), gldc.getLastBlock()->getId()+1);
-	b2.addTransaction(gldc.getFilePath(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), 6, Util::base58Encode(Crypto::getPublicString(key1)));
-	b2.mine(gldc.getDifficulty(), Util::base58Encode(Crypto::getPrivateString(key)), Util::base58Encode(Crypto::getPublicString(key)), gldc.getReward());
-	gldc.addBlock(b2);
-
-	Blockchain parsed = Blockchain::parseBlockchain("gldc");*/
 	
 	// parse command line arguments and act accordingly
 	if(argc <= 1){
