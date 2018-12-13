@@ -6,7 +6,7 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs
+	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc
 	//Block: 
 	//Blockchain: TODO 3 block UTXO bug
 	//Crypto: TODO format hex properly (0x and low caps)
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
 				std::string filePath = argv[2];
 				std::string privKey = argv[3];
 				std::string pubKey = argv[4];
-				std::string metadata = ""; // TODO
+				std::string metadata = "";
 				std::vector<std::string> transactions;
 				
 				// find the metadata argument
@@ -325,6 +325,43 @@ int main(int argc, char* argv[]) {
 				Util::cleanupOpenSSL();
 				return 0;
 			}
+		}else if(argv[1] == std::string("verifyTransaction")){
+			// syntax: blocky verifyTransaction <file path> <transaction hash> <--txpool, --utxo>
+			if(argc != 5){return 1;}
+			std::string filePath = argv[2];
+			std::string file;
+
+			// make sure a file is specified and get the file extension right
+			if(argv[4] == std::string("--txpool")){file = ".txpl";
+			}else if(argv[4] == std::string("--utxo")){file = ".utxo";
+			}else{return 1;}
+
+			// make sure the specified file exists
+			if(!FileManager::isFile(filePath + file)){return 1;}
+
+			for(int i = 0; i < FileManager::getLastLineNum(filePath + file); i++){
+				Transaction t = Transaction::parseTransaction(filePath + file, i);
+				// same hash, same transaction, verify it
+				if(t.getHash() == argv[3]){
+					// verify hash
+					if(t.getHash() != Util::Hash256(t.stringifyVerify())){
+						printf("the transaction hash is worng! %s != %s\n", t.getHash().c_str(), Util::Hash256(t.stringifyVerify()).c_str());
+						return 0;
+					}
+
+					// verify the transaction signature
+					if(Crypto::verify(t.stringifyVerify(), Util::base58Decode(t.getSignature()), Util::base58Decode(t.getDonor())) != 1){
+						printf("the transaction signature is wrong!\n");
+						return 0;
+					}
+
+					printf("the transaction 0x%s is valid!\n", t.getHash().c_str());
+					return 0;
+				}
+			}
+			// no transaction was found
+			printf("didn't find any 0x%s transaction in %s%s file", std::string(argv[3]).c_str(), filePath.c_str(), file.c_str());
+			return 0;
 		}else if(argv[1] == std::string("verifyBlock")){
 			// syntax: blocky verifyBlock <file path> <block height>
 			if(argc < 4){return 1;}
@@ -336,14 +373,6 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("verifyBlockchain")){
 			// syntax: blocky verifyBlockchain <file path>
-			if(argc < 3){return 1;}
-			std::string filePath = argv[2];
-
-			// TODO loop through entire block file and verify each block, if one is invalid, produce a message
-			system("pause");
-			return 0;
-		}else if(argv[1] == std::string("verifyTransaction")){
-			// syntax: blocky verifyTransaction <file path> <transaction hash>
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
 
