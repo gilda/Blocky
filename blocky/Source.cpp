@@ -6,7 +6,7 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc
+	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc, TODO test verification of tx blck blckchn
 	//Block: TODO think about verifyBlock verifying the shit out of the block
 	//Blockchain: TODO 3 block UTXO bug
 	//Crypto: TODO format hex properly (0x and low caps)
@@ -45,7 +45,6 @@ int main(int argc, char* argv[]) {
 	// parse command line arguments and act accordingly
 	if(argc <= 1){
 		printf("%s", Util::helpText().c_str());
-		system("pause");
 		return 0;
 	}else{
 		if(argv[1] == std::string("help") || argv[1] == std::string("--help")){
@@ -426,13 +425,51 @@ int main(int argc, char* argv[]) {
 			// syntax: blocky verifyBlockchain <file path>
 			if(argc < 3){return 1;}
 			std::string filePath = argv[2];
+			
+			// make sure all necesseray files exist
+			if(!FileManager::isFile(filePath + ".meta") || !FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo")){return 1;}
 
-			// TODO loop through entire block file and verify each block, if one is invalid, produce a message
-			system("pause");
+			Blockchain bc = Blockchain::parseBlockchain(filePath);
+			Blockchain bv = Blockchain::Blockchain(filePath + "fake", bc.getDifficulty(), bc.getReward(), bc.getMaxMetadataChar(), bc.getName());
+
+			// count the number of blocks in the blockchain
+			int numBlocks = 0;
+			if(FileManager::isFile(filePath + ".blck")){
+				for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
+					std::string str = FileManager::readLine(filePath + ".blck", i);
+					if(str.find("#") != -1) numBlocks++;
+				}
+			}
+
+			// verify the blocks and add them to fake blockchain
+			for(int i = 0; i < numBlocks; i++){
+				bv.addBlock(Block::parseBlock(filePath + ".blck", i));
+			}
+
+			// verify that the utxo is the same
+			for(int i = 0; i < FileManager::getLastLineNum(filePath + ".utxo"); i++){
+				if(FileManager::readLine(filePath + ".utxo", i) != FileManager::readLine(filePath + "fake.utxo", i)){
+					printf("utxo output from blockchain processing is invalid!\n");
+
+					// remove fake files
+					remove(std::string(filePath + "fake.meta").c_str());
+					remove(std::string(filePath + "fake.blck").c_str());
+					remove(std::string(filePath + "fake.utxo").c_str());
+					return 0;
+				}
+			}
+
+			// remove fake files
+			remove(std::string(filePath + "fake.meta").c_str());
+			remove(std::string(filePath + "fake.blck").c_str());
+			remove(std::string(filePath + "fake.utxo").c_str());
+
+			printf("blockchain %s is completly valid!\n", Blockchain::parseBlockchain(filePath).getName().c_str());
 			return 0;
 		}
 	}
 
-	system("pause");
+	// no arguments given, display help text
+	printf("no arguments given\n%s", Util::helpText().c_str());
 	return 0; // exit Process
 }
