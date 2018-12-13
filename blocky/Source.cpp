@@ -6,7 +6,7 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//CLI: TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc, TODO test verification of tx blck blckchn
+	//CLI: TODO sanitize inputs, TODO assert upper limits on argc, TODO test verification of tx blck blckchn
 	//Block: TODO think about verifyBlock verifying the shit out of the block
 	//Blockchain: TODO 3 block UTXO bug
 	//Crypto: TODO format hex properly (0x and low caps)
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 		}else if(argv[1] == std::string("init")){
 			// syntax: blocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>
 			// parse the command line argumenst
-			if(argc < 7){return 1;}
+			if(argc < 7){printf("not enough arguments to initialize a blockchain. see block.exe help\n");return 1;}
 			// init the OpenSSL library
 			Util::initOpenSSL();
 
@@ -48,10 +48,10 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("printBlockchainParams")){ // print the init params of some blockchain
 			// syntax: blocky printBlockchainParams <filePath>
-			if(argc < 3){return 1;}
+			if(argc < 3){printf("required argument not specified: blockchain file path specified. see blocky.exe help\n");return 1;}
 			std::string filePath = argv[2];
 			// check that the metadata file exists
-			if(!FileManager::isFile(filePath + ".meta")){return 1;}
+			if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str());return 1;}
 
 			// parse and print the parameters
 			std::string name = Blockchain::parseBlockchain(filePath).getName();
@@ -75,27 +75,27 @@ int main(int argc, char* argv[]) {
 			}
 
 			// make sure there are enough arguments
-			if(argc < 4 && !metadata){return 1;}
+			if(argc < 4 && !metadata){printf("not enough arguments were given to print a specific block. see block.exe help");return 1;}
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
 
 			// check if file does not exist
-			if(!FileManager::isFile(filePath + ".blck")){return 1;}
+			if(!FileManager::isFile(filePath + ".blck")){printf("no block data file named %s.blck was found\n", filePath.c_str());return 1;}
 
 			// make sure block exists in the file
-			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){return 1;}
+			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){printf("block with height %d was not found in %s.blck file\n", blockHeight, filePath.c_str());return 1;}
 			
 			// find block in block file and print the entire block with metadata
 			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight).toString(metadata).c_str());
 			return 0;
 		}else if(argv[1] == std::string("printTransaction")){
 			// syntax: blocky printTransaction <file path> <transaction hash>
-			if(argc < 4){return 1;}
+			if(argc < 4){printf("not enough arguements were given to print transaction. see blocky.exe help\n");return 1;}
 			std::string filePath = argv[2];
 			std::string hash = argv[3];
 			
 			// check if file does not exist
-			if(!FileManager::isFile(filePath + ".blck")){return 1;}
+			if(!FileManager::isFile(filePath + ".blck")){printf("no block data file named %s.blck was found\n", filePath.c_str());return 1;}
 
 			// find the max block
 			int maxBlock = 0;
@@ -115,7 +115,8 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
-			return 1;
+			// block was not found
+			return 0;
 		}else if(argv[1] == std::string("genKey")){
 			// syntax: blocky genKey
 			Util::initOpenSSL();
@@ -142,12 +143,12 @@ int main(int argc, char* argv[]) {
 			}
 		}else if(argv[1] == std::string("getBalance")){
 			// syntax: blocky getBalance <file path> <address>
-			if(argc < 4){return 1;}
+			if(argc < 4){printf("not enough argument to return the balance of some address. see blocky.exe help\n");return 1;}
 			std::string filePath = argv[2];
 			std::string address = argv[3];
 
 			// make sure the file exists
-			if(!FileManager::isFile(filePath + ".utxo")){return 1;}
+			if(!FileManager::isFile(filePath + ".utxo")){printf("no utxo data file named %s.utxo was found\n", filePath.c_str());return 1;}
 
 			int balance = 0;
 			// loop through all of UTXO file and accumulate balance of address
@@ -164,7 +165,7 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("addTransaction")){
 			// syntax: blocky addTransaction <file path> <private key> <public key> <amount> <address>
-			if(argc < 7){return 1;}
+			if(argc < 7){printf("not enough arguements to add a transaction to the pool. see blocky.exe help\n");return 1;}
 			// init the OpenSSL library
 			Util::initOpenSSL();
 
@@ -183,6 +184,7 @@ int main(int argc, char* argv[]) {
 		}else if(argv[1] == std::string("mineBlock")){
 			// syntax: blocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]
 			if(argc < 5){ // not enough parameters
+				printf("not enough arguments to mine and add a new block. see blocky.exe help\n");
 				return 1;
 			}else if(argc == 5){ // no transaction to add, only coinbase
 				// init the OpenSSL library
@@ -194,7 +196,7 @@ int main(int argc, char* argv[]) {
 				std::string metadata = ""; // no metadata to add by the number of arguments
 
 				// make sure blockchain parameters were initialized
-				if(!FileManager::isFile(filePath + ".meta")){return 1;}
+				if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str());return 1;}
 
 				// count the number of blocks in the blockchain
 				int numBlocks = 0;
@@ -240,7 +242,7 @@ int main(int argc, char* argv[]) {
 				std::vector<std::string> transactions;
 
 				// make sure blockchain params were initialized
-				if(!FileManager::isFile(filePath + ".meta")){return 1;}
+				if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str());return 1;}
 				
 				// find the metadata argument
 				for(int i = 0; i < argc; i++){
@@ -272,7 +274,16 @@ int main(int argc, char* argv[]) {
 					return 0;
 				}
 
-				if(!FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".txpl") || !FileManager::isFile(filePath + ".blck")){return 1;}
+				if(!FileManager::isFile(filePath + ".utxo") || !FileManager::isFile(filePath + ".txpl") || !FileManager::isFile(filePath + ".blck")){
+					if(!FileManager::isFile(filePath + ".utxo")){
+						printf("no blockchain file named %s.utxo was found\n", filePath.c_str());
+					}else if(!FileManager::isFile(filePath + ".txpl")){
+						printf("no blockchain file named %s.txpl was found\n", filePath.c_str());
+					}else{
+						printf("no blockchain file named %s.blck was found\n", filePath.c_str());
+					}
+					return 1;
+				}
 
 				Block prev = Block::parseBlock(filePath + ".blck", numBlocks - 1);
 				Block b = Block(prev.getCurrHash(), prev.getId() + 1);
@@ -305,17 +316,22 @@ int main(int argc, char* argv[]) {
 			}
 		}else if(argv[1] == std::string("verifyTransaction")){
 			// syntax: blocky verifyTransaction <file path> <transaction hash> <--txpool, --utxo>
-			if(argc != 5){return 1;}
+			if(argc != 5){printf("not enough arguments to verify transaction. see blocky.exe help\n");return 1;}
 			std::string filePath = argv[2];
 			std::string file;
 
 			// make sure a file is specified and get the file extension right
-			if(argv[4] == std::string("--txpool")){file = ".txpl";
-			}else if(argv[4] == std::string("--utxo")){file = ".utxo";
-			}else{return 1;}
+			if(argv[4] == std::string("--txpool")){
+				file = ".txpl";
+			}else if(argv[4] == std::string("--utxo")){
+				file = ".utxo";
+			}else{
+				printf("last argument to verifyTransaction must be --txpool or --utxo\n");
+				return 1;
+			}
 
 			// make sure the specified file exists
-			if(!FileManager::isFile(filePath + file)){return 1;}
+			if(!FileManager::isFile(filePath + file)){printf("no blockchain file named %s.%s was found\n", filePath.c_str(), file.c_str());return 1;}
 
 			for(int i = 0; i < FileManager::getLastLineNum(filePath + file); i++){
 				Transaction t = Transaction::parseTransaction(filePath + file, i);
@@ -344,7 +360,7 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("verifyBlock")){
 			// syntax: blocky verifyBlock <file path> <block height>
-			if(argc < 4){return 1;}
+			if(argc < 4){printf("not enough arguements to verifyBlock. see blocky.exe help\n");return 1;}
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
 			
@@ -396,11 +412,20 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("verifyBlockchain")){
 			// syntax: blocky verifyBlockchain <file path>
-			if(argc < 3){return 1;}
+			if(argc < 3){printf("not enough arguments for verifyBlockchain. see blocky.exe help\n");return 1;}
 			std::string filePath = argv[2];
 			
 			// make sure all necesseray files exist
-			if(!FileManager::isFile(filePath + ".meta") || !FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo")){return 1;}
+			if(!FileManager::isFile(filePath + ".meta") || !FileManager::isFile(filePath + ".blck") || !FileManager::isFile(filePath + ".utxo")){
+				if(!FileManager::isFile(filePath + ".meta")){
+					printf("no blockchain file named %s.meta was found\n", filePath.c_str());
+				}else if(!FileManager::isFile(filePath + ".blck")){
+					printf("no blockchain file named %s.blck was found\n", filePath.c_str());
+				}else{
+					printf("no blockchain file named %s.utxo was found\n", filePath.c_str());
+				}
+				return 1;
+			}
 
 			Blockchain bc = Blockchain::parseBlockchain(filePath);
 			Blockchain bv = Blockchain::Blockchain(filePath + "fake", bc.getDifficulty(), bc.getReward(), bc.getMaxMetadataChar(), bc.getName());
