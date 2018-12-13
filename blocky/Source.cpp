@@ -7,11 +7,11 @@
 
 int main(int argc, char* argv[]) {
 	//CLI: TODO get rid of all the system("pause") before release, TODO get rid of weird printf()s, TODO change return 1s to usefull error messages, TODO sanitize inputs, TODO assert upper limits on argc
-	//Block: 
+	//Block: TODO think about verifyBlock verifying the shit out of the block
 	//Blockchain: TODO 3 block UTXO bug
 	//Crypto: TODO format hex properly (0x and low caps)
 	//GUI:
-	//Transaction:
+	//Transaction: TODO think about verifyTransaction verifying the shit out of the Transaction
 	//Util:
 	//FileManager:
 
@@ -221,6 +221,9 @@ int main(int argc, char* argv[]) {
 				std::string pubKey = argv[4];
 				std::string metadata = ""; // no metadata to add by the number of arguments
 
+				// make sure blockchain parameters were initialized
+				if(!FileManager::isFile(filePath + ".meta")){return 1;}
+
 				// count the number of blocks in the blockchain
 				int numBlocks = 0;
 				if(FileManager::isFile(filePath + ".blck")){
@@ -263,6 +266,9 @@ int main(int argc, char* argv[]) {
 				std::string pubKey = argv[4];
 				std::string metadata = "";
 				std::vector<std::string> transactions;
+
+				// make sure blockchain params were initialized
+				if(!FileManager::isFile(filePath + ".meta")){return 1;}
 				
 				// find the metadata argument
 				for(int i = 0; i < argc; i++){
@@ -343,9 +349,10 @@ int main(int argc, char* argv[]) {
 				Transaction t = Transaction::parseTransaction(filePath + file, i);
 				// same hash, same transaction, verify it
 				if(t.getHash() == argv[3]){
+					
 					// verify hash
 					if(t.getHash() != Util::Hash256(t.stringifyVerify())){
-						printf("the transaction hash is worng! %s != %s\n", t.getHash().c_str(), Util::Hash256(t.stringifyVerify()).c_str());
+						printf("the transaction hash is worng! 0x%s != 0x%s\n", t.getHash().c_str(), Util::Hash256(t.stringifyVerify()).c_str());
 						return 0;
 					}
 
@@ -355,6 +362,7 @@ int main(int argc, char* argv[]) {
 						return 0;
 					}
 
+					// transaction is completely valid
 					printf("the transaction 0x%s is valid!\n", t.getHash().c_str());
 					return 0;
 				}
@@ -367,9 +375,52 @@ int main(int argc, char* argv[]) {
 			if(argc < 4){return 1;}
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
+			
+			
+			// count the number of blocks in the blockchain
+			int numBlocks = 0;
+			if(FileManager::isFile(filePath + ".blck")){
+				for(int i = 0; i < FileManager::getLastLineNum(filePath + ".blck"); i++){
+					std::string str = FileManager::readLine(filePath + ".blck", i);
+					if(str.find("#") != -1) numBlocks++;
+				}
+			}
 
-			// TODO loop through all of block file, find the block and dump it with metadata
-			system("pause");
+			// verify each block hash and transaction inside
+			Block b = Block::parseBlock(filePath + ".blck", blockHeight);
+				
+			// verify previous block hash
+			if(blockHeight != 0){
+				Block prev = Block::parseBlock(filePath + ".blck", blockHeight - 1);
+				if(prev.getCurrHash() != b.getPrevHash()){
+					printf("block #%d's previous hash does not match block #%d's hash! 0x%s != 0x%s\n", blockHeight, blockHeight - 1, b.getPrevHash().c_str(), prev.getCurrHash().c_str());
+				}
+			}
+
+			// verify current block hash
+			if(b.getCurrHash() != Util::Hash256(b.stringify())){
+				printf("block #%d's hash does not match its curent hash! 0x%s != 0x%s\n", blockHeight, b.getCurrHash().c_str(), Util::Hash256(b.stringify()).c_str());
+				return 0;
+			}
+			
+			// verify each transaction
+			for(int i = 0; i < b.getNumTrans(); i++){
+				Transaction t = *b.getTransaction(i);
+				// verify transaction hash
+				if(t.getHash() != Util::Hash256(t.stringifyVerify())){
+					printf("transaction 0x%s of block #%d's hash is invalid! 0x%s != 0x%s\n", t.getHash().c_str(), blockHeight, t.getHash().c_str(), Util::Hash256(t.stringifyVerify()).c_str());
+					return 0;
+				}
+
+				// verify transaction signature
+				if(Crypto::verify(t.stringifyVerify(), Util::base58Decode(t.getSignature()), Util::base58Decode(t.getDonor())) != 1){
+					printf("transaction 0x%s of block #%d's signature is invalid!\n", t.getHash().c_str(), blockHeight);
+					return 0;
+				}
+			}
+
+			// the whole block is completly valid
+			printf("block #%d is valid!\n", blockHeight);
 			return 0;
 		}else if(argv[1] == std::string("verifyBlockchain")){
 			// syntax: blocky verifyBlockchain <file path>
