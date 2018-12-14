@@ -30,8 +30,8 @@
     <ClCompile Include="Blockchain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>Source Files\Helper</Filter>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Crypto.cpp">
       <Filter>Source Files\Helper</Filter>
@@ -39,8 +39,8 @@
     <ClCompile Include="FileManager.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,8 +53,8 @@
     <ClInclude Include="Blockchain.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Util.h">
-      <Filter>Source Files\Helper</Filter>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Crypto.h">
       <Filter>Source Files\Helper</Filter>
@@ -62,8 +62,8 @@
     <ClInclude Include="FileManager.h">
       <Filter>Source Files\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Util.h">
+      <Filter>Source Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

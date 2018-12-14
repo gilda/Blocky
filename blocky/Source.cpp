@@ -6,17 +6,18 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//CLI: TODO sanitize inputs, TODO assert upper limits on argc, TODO test verification of tx blck blckchn
+	//CLI: TODO test verification of tx blck blckchn
+	//Util: TODO make help just as in gamma-cli
+	//Blockchain: TODO 3 block UTXO bug, TODO maxTransaction
 	//Block: TODO think about verifyBlock verifying the shit out of the block
-	//Blockchain: TODO 3 block UTXO bug
-	//Crypto: TODO format hex properly (0x and low caps)
-	//GUI:
 	//Transaction: TODO think about verifyTransaction verifying the shit out of the Transaction
-	//Util:
+	//Crypto: 
+	//GUI:
 	//FileManager:
-	
+
 	// parse command line arguments and act accordingly
-	if(argc <= 1){
+	if(argc == 1){
+		// only blocky.exe print help 
 		printf("%s", Util::helpText().c_str());
 		return 0;
 	}else{
@@ -29,7 +30,21 @@ int main(int argc, char* argv[]) {
 		}else if(argv[1] == std::string("init")){
 			// syntax: blocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>
 			// parse the command line argumenst
-			if(argc < 7){printf("not enough arguments to initialize a blockchain. see block.exe help\n");return 1;}
+			if(argc < 7){printf("not enough arguments to initialize a blockchain. see block.exe help\n"); return 1;}
+			if(argc > 7){printf("too many arguments to initialize a blockchain. see block.exe help\n"); return 1;}
+
+			// sanitize inputs
+			if(std::string(argv[3]).empty() || std::all_of(std::string(argv[3]).begin(), std::string(argv[3]).end(), ::isdigit)){
+				printf("difficulty parameter must be an integer, %s is not an integer!\n", argv[3]);
+				return 1;
+			}else if(std::string(argv[4]).empty() || std::all_of(std::string(argv[4]).begin(), std::string(argv[4]).end(), ::isdigit)){
+				printf("reward parameter must be an integer, %s is not an integer!\n", argv[4]);
+				return 1;
+			}else if(std::string(argv[5]).empty() || std::all_of(std::string(argv[5]).begin(), std::string(argv[5]).end(), ::isdigit)){
+				printf("maximum metadata characters parameter must be an integer, %s is not an integer!\n", argv[5]);
+				return 1;
+			}
+			
 			// init the OpenSSL library
 			Util::initOpenSSL();
 
@@ -48,10 +63,13 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("printBlockchainParams")){ // print the init params of some blockchain
 			// syntax: blocky printBlockchainParams <filePath>
-			if(argc < 3){printf("required argument not specified: blockchain file path specified. see blocky.exe help\n");return 1;}
+			if(argc < 3){printf("required argument is not specified: blockchain file path is not specified. see blocky.exe help\n"); return 1;}
+			if(argc < 3){printf("too many arguments to print the blockchain parameters. see blocky.exe help\n"); return 1;}
+			
 			std::string filePath = argv[2];
+			
 			// check that the metadata file exists
-			if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str());return 1;}
+			if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str()); return 1;}
 
 			// parse and print the parameters
 			std::string name = Blockchain::parseBlockchain(filePath).getName();
@@ -75,27 +93,43 @@ int main(int argc, char* argv[]) {
 			}
 
 			// make sure there are enough arguments
-			if(argc < 4 && !metadata){printf("not enough arguments were given to print a specific block. see block.exe help");return 1;}
+			if(argc < 4 && !metadata){printf("not enough arguments were given to print a specific block. see block.exe help"); return 1;}
+			if(argc > 5){printf("too many parameters to print block. see block.exe help"); return 1;}
+
+			// sanitize inputs
+			if(std::string(argv[3]).empty() || std::all_of(std::string(argv[3]).begin(), std::string(argv[3]).end(), ::isdigit)){
+				printf("block height parameter must be an integer, %s is not an integer!\n", argv[3]);
+				return 1;
+			}
+
 			std::string filePath = argv[2];
 			int blockHeight = std::stoi(argv[3]);
 
 			// check if file does not exist
-			if(!FileManager::isFile(filePath + ".blck")){printf("no block data file named %s.blck was found\n", filePath.c_str());return 1;}
+			if(!FileManager::isFile(filePath + ".blck")){printf("no block data file named %s.blck was found\n", filePath.c_str()); return 1;}
 
 			// make sure block exists in the file
-			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){printf("block with height %d was not found in %s.blck file\n", blockHeight, filePath.c_str());return 1;}
+			if(Block::parseBlock(filePath + ".blck", blockHeight).empty()){printf("block with height %d was not found in %s.blck file\n", blockHeight, filePath.c_str()); return 1;}
 			
 			// find block in block file and print the entire block with metadata
 			printf("%s\n", Block::parseBlock(filePath + ".blck", blockHeight).toString(metadata).c_str());
 			return 0;
 		}else if(argv[1] == std::string("printTransaction")){
 			// syntax: blocky printTransaction <file path> <transaction hash>
-			if(argc < 4){printf("not enough arguements were given to print transaction. see blocky.exe help\n");return 1;}
+			if(argc < 4){printf("not enough arguements were given to print transaction. see blocky.exe help\n"); return 1;}
+			if(argc > 4){printf("too many arguements were given to print transaction. see blocky.exe help\n"); return 1;}
+
 			std::string filePath = argv[2];
 			std::string hash = argv[3];
+
+			// sanitize input
+			if(hash.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos){
+				printf("transaction hash parameter must be a hex number, %s is not a hex number!\n", hash.c_str());
+				return 1;
+			}
 			
 			// check if file does not exist
-			if(!FileManager::isFile(filePath + ".blck")){printf("no block data file named %s.blck was found\n", filePath.c_str());return 1;}
+			if(!FileManager::isFile(filePath + ".blck")){printf("no block data file named %s.blck was found\n", filePath.c_str()); return 1;}
 
 			// find the max block
 			int maxBlock = 0;
@@ -143,12 +177,20 @@ int main(int argc, char* argv[]) {
 			}
 		}else if(argv[1] == std::string("getBalance")){
 			// syntax: blocky getBalance <file path> <address>
-			if(argc < 4){printf("not enough argument to return the balance of some address. see blocky.exe help\n");return 1;}
+			if(argc < 4){printf("not enough arguments to return the balance of some address. see blocky.exe help\n"); return 1;}
+			if(argc > 4){printf("too many arguments to return the balance of some address. see blocky.exe help\n"); return 1;}
+
 			std::string filePath = argv[2];
 			std::string address = argv[3];
 
+			// sanitize input
+			if(address.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+				printf("address parameter must be a base58 encoded address, %s is not a bas58 encoded address!\n", address.c_str());
+				return 1;
+			}
+
 			// make sure the file exists
-			if(!FileManager::isFile(filePath + ".utxo")){printf("no utxo data file named %s.utxo was found\n", filePath.c_str());return 1;}
+			if(!FileManager::isFile(filePath + ".utxo")){printf("no utxo data file named %s.utxo was found\n", filePath.c_str()); return 1;}
 
 			int balance = 0;
 			// loop through all of UTXO file and accumulate balance of address
@@ -165,16 +207,34 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("addTransaction")){
 			// syntax: blocky addTransaction <file path> <private key> <public key> <amount> <address>
-			if(argc < 7){printf("not enough arguements to add a transaction to the pool. see blocky.exe help\n");return 1;}
-			// init the OpenSSL library
-			Util::initOpenSSL();
+			if(argc < 7){printf("not enough arguements to add a transaction to the pool. see blocky.exe help\n"); return 1;}
+			if(argc > 7){printf("too many arguements to add a transaction to the pool. see blocky.exe help\n"); return 1;}
 
 			std::string filePath = argv[2];
 			std::string privKey = argv[3];
 			std::string pubKey = argv[4];
-			int amount = std::stoi(argv[5]);
 			std::string address = argv[6];
 
+			// sanitize input
+			if(privKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+				printf("private key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", privKey.c_str());
+				return 1;
+			}else if(pubKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+				printf("public key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", pubKey.c_str());
+				return 1;
+			}else if(std::string(argv[5]).empty() || std::all_of(std::string(argv[5]).begin(), std::string(argv[5]).end(), ::isdigit)){
+				printf("amount parameter must be an integer, %s is not an integer!\n", argv[5]);
+				return 1;
+			}else if(address.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+				printf("address parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", address.c_str());
+				return 1;
+			}
+			
+			// parse the amount after sanitization
+			int amount = std::stoi(argv[5]);
+
+			// init the OpenSSL library
+			Util::initOpenSSL();
 			// add the transaction to the txpool for miners to add
 			Blockchain::addToTransactionPool(filePath, privKey, pubKey, amount, address);
 			
@@ -195,8 +255,17 @@ int main(int argc, char* argv[]) {
 				std::string pubKey = argv[4];
 				std::string metadata = ""; // no metadata to add by the number of arguments
 
+				// sanitize input
+				if(privKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+					printf("private key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", privKey.c_str());
+					return 1;
+				}else if(pubKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+					printf("public key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", pubKey.c_str());
+					return 1;
+				}
+
 				// make sure blockchain parameters were initialized
-				if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str());return 1;}
+				if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str()); return 1;}
 
 				// count the number of blocks in the blockchain
 				int numBlocks = 0;
@@ -241,8 +310,17 @@ int main(int argc, char* argv[]) {
 				std::string metadata = "";
 				std::vector<std::string> transactions;
 
+				// sanitize input
+				if(privKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+					printf("private key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", privKey.c_str());
+					return 1;
+				}else if(pubKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+					printf("public key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", pubKey.c_str());
+					return 1;
+				}
+
 				// make sure blockchain params were initialized
-				if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str());return 1;}
+				if(!FileManager::isFile(filePath + ".meta")){printf("no blockchain file named %s.meta was found\n", filePath.c_str()); return 1;}
 				
 				// find the metadata argument
 				for(int i = 0; i < argc; i++){
@@ -316,7 +394,9 @@ int main(int argc, char* argv[]) {
 			}
 		}else if(argv[1] == std::string("verifyTransaction")){
 			// syntax: blocky verifyTransaction <file path> <transaction hash> <--txpool, --utxo>
-			if(argc != 5){printf("not enough arguments to verify transaction. see blocky.exe help\n");return 1;}
+			if(argc < 5){printf("not enough arguments to verify transaction. see blocky.exe help\n"); return 1;}
+			if(argc > 5){printf("too many arguments to verify transaction. see blocky.exe help\n"); return 1;}
+			
 			std::string filePath = argv[2];
 			std::string file;
 
@@ -330,8 +410,14 @@ int main(int argc, char* argv[]) {
 				return 1;
 			}
 
+			// sanitize input
+			if(std::string(argv[3]).find_first_not_of("0123456789abcdefABCDEF") != std::string::npos){
+				printf("transaction hash parameter must be a hex number, %s is not a hex number!\n", argv[3]);
+				return 1;
+			}
+
 			// make sure the specified file exists
-			if(!FileManager::isFile(filePath + file)){printf("no blockchain file named %s.%s was found\n", filePath.c_str(), file.c_str());return 1;}
+			if(!FileManager::isFile(filePath + file)){printf("no blockchain file named %s.%s was found\n", filePath.c_str(), file.c_str()); return 1;}
 
 			for(int i = 0; i < FileManager::getLastLineNum(filePath + file); i++){
 				Transaction t = Transaction::parseTransaction(filePath + file, i);
@@ -360,10 +446,18 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("verifyBlock")){
 			// syntax: blocky verifyBlock <file path> <block height>
-			if(argc < 4){printf("not enough arguements to verifyBlock. see blocky.exe help\n");return 1;}
+			if(argc < 4){printf("not enough arguements to verifyBlock. see blocky.exe help\n"); return 1;}
+			if(argc > 4){printf("too many arguements to verifyBlock. see blocky.exe help\n"); return 1;}
+
 			std::string filePath = argv[2];
+
+			// sanitize inputs
+			if(std::string(argv[3]).empty() || std::all_of(std::string(argv[3]).begin(), std::string(argv[3]).end(), ::isdigit)){
+				printf("block height parameter must be an integer, %s is not an integer!\n", argv[3]);
+				return 1;
+			}
+
 			int blockHeight = std::stoi(argv[3]);
-			
 			
 			// count the number of blocks in the blockchain
 			int numBlocks = 0;
@@ -412,7 +506,9 @@ int main(int argc, char* argv[]) {
 			return 0;
 		}else if(argv[1] == std::string("verifyBlockchain")){
 			// syntax: blocky verifyBlockchain <file path>
-			if(argc < 3){printf("not enough arguments for verifyBlockchain. see blocky.exe help\n");return 1;}
+			if(argc < 3){printf("not enough arguments for verifyBlockchain. see blocky.exe help\n"); return 1;}
+			if(argc > 3){printf("too many arguments for verifyBlockchain. see blocky.exe help\n"); return 1;}
+
 			std::string filePath = argv[2];
 			
 			// make sure all necesseray files exist
