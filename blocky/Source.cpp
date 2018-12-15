@@ -178,6 +178,14 @@ int main(int argc, char* argv[]) {
 				Util::cleanupOpenSSL();
 				return 0;
 			}else{
+
+				// sanitize input
+				std::string privKey = argv[2];
+				if(privKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
+					printf("privateKey parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", privKey.c_str());
+					return 1;
+				}
+
 				// derive from private key
 				printf("the corresponding public key for this private key is: %s\n", Util::base58Encode(Crypto::derivePublicFromPrivate(Util::base58Decode(argv[2]))).c_str());
 				Util::cleanupOpenSSL();
