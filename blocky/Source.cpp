@@ -8,7 +8,7 @@
 int main(int argc, char* argv[]) {
 	//CLI: TODO test verification of tx blck blckchn
 	//Util: TODO make help just as in gamma-cli
-	//Blockchain: TODO 3 block UTXO bug, TODO maxTransaction
+	//Blockchain: TODO maxTransaction
 	//Block: TODO think about verifyBlock verifying the shit out of the block
 	//Transaction: TODO think about verifyTransaction verifying the shit out of the Transaction
 	//Crypto: 
@@ -32,27 +32,32 @@ int main(int argc, char* argv[]) {
 			// parse the command line argumenst
 			if(argc < 7){printf("not enough arguments to initialize a blockchain. see block.exe help\n"); return 1;}
 			if(argc > 7){printf("too many arguments to initialize a blockchain. see block.exe help\n"); return 1;}
+			
+			std::string filePath = argv[2];
+			std::string difficultyString = argv[3];
+			std::string rewardString = argv[4];
+			std::string maxMetadataCharString = argv[5];
+			std::string name = argv[6];
 
 			// sanitize inputs
-			if(std::string(argv[3]).empty() || std::all_of(std::string(argv[3]).begin(), std::string(argv[3]).end(), ::isdigit)){
+			if(difficultyString.empty() || !std::all_of(difficultyString.begin(), difficultyString.end(), ::isdigit)){
 				printf("difficulty parameter must be an integer, %s is not an integer!\n", argv[3]);
 				return 1;
-			}else if(std::string(argv[4]).empty() || std::all_of(std::string(argv[4]).begin(), std::string(argv[4]).end(), ::isdigit)){
+			}else if(rewardString.empty() || !std::all_of(rewardString.begin(), rewardString.end(), ::isdigit)){
 				printf("reward parameter must be an integer, %s is not an integer!\n", argv[4]);
 				return 1;
-			}else if(std::string(argv[5]).empty() || std::all_of(std::string(argv[5]).begin(), std::string(argv[5]).end(), ::isdigit)){
+			}else if(maxMetadataCharString.empty() || !std::all_of(maxMetadataCharString.begin(), maxMetadataCharString.end(), ::isdigit)){
 				printf("maximum metadata characters parameter must be an integer, %s is not an integer!\n", argv[5]);
 				return 1;
 			}
 			
-			// init the OpenSSL library
-			Util::initOpenSSL();
-
-			std::string filePath = argv[2];
 			int difficulty = std::stoi(argv[3]);
 			int reward = std::stoi(argv[4]);
 			int maxMetadataChar = std::stoi(argv[5]);
-			std::string name = argv[6];
+
+			// init the OpenSSL library
+			Util::initOpenSSL();
+
 			
 			// create the new blockchain
 			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, maxMetadataChar,name);
@@ -91,18 +96,21 @@ int main(int argc, char* argv[]) {
 					break;
 				}
 			}
+			
+			std::string filePath = argv[2];
+			std::string blockHeightString = argv[3];
 
 			// make sure there are enough arguments
 			if(argc < 4 && !metadata){printf("not enough arguments were given to print a specific block. see block.exe help"); return 1;}
 			if(argc > 5){printf("too many parameters to print block. see block.exe help"); return 1;}
 
 			// sanitize inputs
-			if(std::string(argv[3]).empty() || std::all_of(std::string(argv[3]).begin(), std::string(argv[3]).end(), ::isdigit)){
+			if(blockHeightString.empty() || !std::all_of(blockHeightString.begin(), blockHeightString.end(), ::isdigit)){
 				printf("block height parameter must be an integer, %s is not an integer!\n", argv[3]);
 				return 1;
 			}
 
-			std::string filePath = argv[2];
+			// parse the block height parameter after sanitization
 			int blockHeight = std::stoi(argv[3]);
 
 			// check if file does not exist
@@ -213,6 +221,7 @@ int main(int argc, char* argv[]) {
 			std::string filePath = argv[2];
 			std::string privKey = argv[3];
 			std::string pubKey = argv[4];
+			std::string amountString = argv[5];
 			std::string address = argv[6];
 
 			// sanitize input
@@ -222,7 +231,7 @@ int main(int argc, char* argv[]) {
 			}else if(pubKey.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
 				printf("public key parameter must be a base58 encoded address, %s is not a base58 encoded adress!\n", pubKey.c_str());
 				return 1;
-			}else if(std::string(argv[5]).empty() || std::all_of(std::string(argv[5]).begin(), std::string(argv[5]).end(), ::isdigit)){
+			}else if(amountString.empty() || !std::all_of(amountString.begin(), amountString.end(), ::isdigit)){
 				printf("amount parameter must be an integer, %s is not an integer!\n", argv[5]);
 				return 1;
 			}else if(address.find_first_not_of("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz") != std::string::npos){
@@ -450,13 +459,15 @@ int main(int argc, char* argv[]) {
 			if(argc > 4){printf("too many arguements to verifyBlock. see blocky.exe help\n"); return 1;}
 
 			std::string filePath = argv[2];
+			std::string blockHeightString = argv[3];
 
 			// sanitize inputs
-			if(std::string(argv[3]).empty() || std::all_of(std::string(argv[3]).begin(), std::string(argv[3]).end(), ::isdigit)){
+			if(blockHeightString.empty() || !std::all_of(blockHeightString.begin(), blockHeightString.end(), ::isdigit)){
 				printf("block height parameter must be an integer, %s is not an integer!\n", argv[3]);
 				return 1;
 			}
 
+			// parse the block height parameter after sanitizition
 			int blockHeight = std::stoi(argv[3]);
 			
 			// count the number of blocks in the blockchain
