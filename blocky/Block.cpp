@@ -139,8 +139,8 @@ bool Block::mine(int difficulty, std::string minerPrivKey, std::string minerPubK
 	this->numTrans++;
 
 	this->metadata = metadata;
-	printf("starting to mine...\n");
-	printf("raw data: %s\n", this->stringify().c_str());
+	printf("starting to mine...\n\n");
+	printf("raw data: \n\n%s\n\n", this->stringify().c_str());
 	// start clock
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 

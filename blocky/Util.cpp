@@ -186,21 +186,22 @@ namespace Util {
 	// return the help text for the program
 	std::string helpText(){
 		std::string help =
-			"Welcome to the blocky blockchain program!\n"
-			"Usage:\n"
-			"\tblocky command --option <argument>\n"
-			"\tblocky help --help\tdisplay this help message\n"
-			"\tblocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>\tcreate a new blockchain\n"
-			"\tblocky printBlockchainParams <filePath>\tdisplay the blockchain metadata given a file path\n"
-			"\tblocky printBlock <file path> <block height>\tprint a raw block from a blockchain file\n"
-			"\tblocky printTransaction <file path> <transaction hash>\tprint a transaction given a hash of it\n"
-			"\tblocky genKey\tgenerate a new keypair\n"
-			"\tblocky getBalance <file path> <address>\tdisplays the balance of a given address\n"
-			"\tblocky addTransaction <file path> <private key> <public key> <amount> <address>\tadds a new transaction to the transaction pool\n"
-			"\tblocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]\t create mine and add a new block to the blockchain\n"
-			"\tblocky verifyTransaction <file path> <transaction hash> <--txpool, --utxo>\treturns whether or not a transaction is valid\n"
-			"\tblocky verifyBlock <file path> <block height>\treturns whether or not a block in the blockchain is valid\n"
-			"\tblocky verifyBlockchain <file path>\treturns whether or not the entire blockchain is valid\n";
+			"Welcome to the blocky blockchain program!\n\n"
+			"Usage:\n\n"
+			"blocky.exe command <argument> [--option]\n\n"
+			"Commands:\n\n"
+			"\tblocky <help --help>\tdisplay this help message\n\n"
+			"\tblocky init <file path> <difficulty> <reward> <maxMetadataChar> <name>\tcreate a new blockchain\n\n"
+			"\tblocky printBlockchainParams <filePath>\tdisplay the blockchain metadata given a file path\n\n"
+			"\tblocky printBlock <file path> <block height>\tprint a raw block from a blockchain file\n\n"
+			"\tblocky printTransaction <file path> <transaction hash>\tprint a transaction given a hash of it\n\n"
+			"\tblocky genKey\tgenerate a new keypair\n\n"
+			"\tblocky getBalance <file path> <address>\tdisplays the balance of a given address\n\n"
+			"\tblocky addTransaction <file path> <private key> <public key> <amount> <address>\tadds a new transaction to the transaction pool\n\n"
+			"\tblocky mineBlock <file path> <private Key> <public Key> <tranaction hash>... [<--metadata>]\t create, mine and add a new block to the blockchain\n\n"
+			"\tblocky verifyTransaction <file path> <transaction hash> <--txpool, --utxo>\treturns whether or not a transaction is valid\n\n"
+			"\tblocky verifyBlock <file path> <block height>\treturns whether or not a block in the blockchain is valid\n\n"
+			"\tblocky verifyBlockchain <file path>\treturns whether or not the entire blockchain is valid\n\n";
 		return help;
 	}
 }

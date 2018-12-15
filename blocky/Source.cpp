@@ -6,14 +6,6 @@
 #include "Transaction.h"
 
 int main(int argc, char* argv[]) {
-	//CLI: TODO test verification of tx blck blckchn
-	//Util: TODO make help just as in gamma-cli
-	//Blockchain: TODO maxTransaction
-	//Block: TODO think about verifyBlock verifying the shit out of the block
-	//Transaction: TODO think about verifyTransaction verifying the shit out of the Transaction
-	//Crypto: 
-	//GUI:
-	//FileManager:
 
 	// parse command line arguments and act accordingly
 	if(argc == 1){
@@ -61,7 +53,7 @@ int main(int argc, char* argv[]) {
 			
 			// create the new blockchain
 			Blockchain newBlockchain = Blockchain(filePath, difficulty, reward, maxMetadataChar,name);
-			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d", name.c_str(), filePath.c_str(), difficulty, reward);
+			printf("created a new blockcahin named %s under the file name %s with mining difficulty of %d and reward of %d\n", name.c_str(), filePath.c_str(), difficulty, reward);
 			
 			// clean the OpenSSL library
 			Util::cleanupOpenSSL();
@@ -169,10 +161,10 @@ int main(int argc, char* argv[]) {
 				EC_KEY *newKey = Crypto::genKey();
 
 				// prompt the user
-				printf("this is your new public key, you can send this key to others so they can send you some tokens:\n%s\n", Util::base58Encode(Crypto::getPublicString(newKey)).c_str());
-				printf("if you are ready, press any key to view your private key\n");
+				printf("this is your new public key, you can send this key to others so they can send you some tokens:\n\n%s\n\n", Util::base58Encode(Crypto::getPublicString(newKey)).c_str());
+				printf("if you are ready, press any key to view your private key\n\n");
 				system("pause");
-				printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n%s\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
+				printf("this is your new private key, keep it only to yourself and it should be only used to recover your public key or send tokens:\n\n%s\n\n", Util::base58Encode(Crypto::getPrivateString(newKey)).c_str());
 
 				// clean the OpenSSL library
 				Util::cleanupOpenSSL();
